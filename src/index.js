@@ -3,9 +3,15 @@ const express = require('express');
 const { engine } = require('express-handlebars'); 
 const app = express();
 const port = 3000;
+const route = require('./routes');
+
 
 //xử lý static file
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 // Template engine
 app.engine('hbs', engine({
    extname: '.hbs'
@@ -13,15 +19,8 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources/views'));
 
-
-// Định nghĩa tuyến đường
-app.get('/', (req, res) => {
-  res.render('home');
-});
-
-app.get('/new', (req, res) => {
-  res.render('new');
-}); 
+//khởi tạo tuyến đường
+route(app);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
