@@ -1,33 +1,36 @@
-const { DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connectDB');
 
-const Product = sequelize.define('Product', {
+class Product extends Model {}
+
+Product.init({
     id_product: {
-        type: DataTypes.STRING(50),
-        primaryKey: true
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
     },
     name_product: {
-        type: DataTypes.STRING(200),
-        allowNull: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
     price: {
-        type: DataTypes.STRING(100),
-        allowNull: true
+        type: DataTypes.FLOAT,
+        allowNull: false
     },
     image_product: {
-        type: DataTypes.STRING(200),
+        type: DataTypes.STRING,
         allowNull: true
     },
     quantity: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: false
     },
     dimension: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING,
         allowNull: true
     },
     manufacturer: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING,
         allowNull: true
     },
     page: {
@@ -35,28 +38,33 @@ const Product = sequelize.define('Product', {
         allowNull: true
     },
     author: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING,
         allowNull: true
     },
     publisher: {
-        type: DataTypes.STRING(200),
+        type: DataTypes.STRING,
         allowNull: true
     },
     publisher_year: {
-        type: DataTypes.INTEGER(4),
+        type: DataTypes.INTEGER,
         allowNull: true
     },
     text_product: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.TEXT,
         allowNull: true
     },
     id_category: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: false,
+        references: {
+            model: 'categories',
+            key: 'id_category'
+        }
     }
-}, {
-    tableName: 'products',
-    timestamps: false
+}, { 
+    sequelize, 
+    modelName: 'product',
+    timestamps: false // Tắt tự động tạo các cột createdAt và updatedAt
 });
 
 module.exports = Product;

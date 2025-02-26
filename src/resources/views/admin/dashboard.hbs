@@ -1,0 +1,95 @@
+{{!-- Sử dụng layout 'main' --}}
+<section class="p-6 bg-gray-100 min-h-screen">
+    <div class="container mx-auto">
+        <!-- Tiêu đề -->
+        <h3 class="text-center mb-4 text-3xl font-bold text-gray-700">Bảng Điều Khiển</h3>
+        <h2 class="text-center mb-6 text-xl font-semibold text-gray-600">Xin chào, {{user.name_login}}!</h2>
+
+        <!-- Thống kê chính -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Tổng Sản Phẩm -->
+            <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-600">Tổng Sản Phẩm</h4>
+                        <p class="text-3xl font-bold text-gray-800">{{totalProducts}}</p>
+                    </div>
+                    <div class="bg-blue-500 text-white p-3 rounded-full shadow-md">
+                        <i class="fas fa-box text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng Khách Hàng -->
+            <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-600">Tổng Khách Hàng</h4>
+                        <p class="text-3xl font-bold text-gray-800">{{totalCustomers}}</p>
+                    </div>
+                    <div class="bg-red-500 text-white p-3 rounded-full shadow-md">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng Đơn Hàng -->
+            <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-600">Tổng Đơn Hàng</h4>
+                        <p class="text-3xl font-bold text-gray-800">{{totalOrders}}</p>
+                    </div>
+                    <div class="bg-green-500 text-white p-3 rounded-full shadow-md">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng Doanh Thu -->
+            <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-600">Tổng Doanh Thu</h4>
+                        <p class="text-3xl font-bold text-gray-800">{{totalRevenue}} VNĐ</p>
+                    </div>
+                    <div class="bg-yellow-500 text-white p-3 rounded-full shadow-md">
+                        <i class="fas fa-dollar-sign text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ Doanh Thu -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mt-6">
+            <h4 class="text-lg font-semibold text-gray-600 mb-4">Biểu đồ doanh thu</h4>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</section>
+
+<!-- Thêm Biểu Đồ JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{{ json monthLabels }}}, // Sử dụng helper json
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: {{{ json revenueData }}}, // Sử dụng helper json
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script>
+

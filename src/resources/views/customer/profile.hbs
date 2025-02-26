@@ -1,0 +1,69 @@
+{{!-- Sử dụng layout 'home' --}}
+{{!< home}}
+
+<section class="p-6 bg-gray-50">
+    <div class="container mx-auto">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="bg-gray-100 px-6 py-4 border-b">
+                <h3 class="text-center mb-4 text-2xl font-semibold">Thông tin cá nhân</h3>
+            </div>
+            <div class="p-4">
+                <ul class="nav nav-tabs" id="profileTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="view-profile-tab" data-toggle="tab" href="#view-profile" role="tab" aria-controls="view-profile" aria-selected="true">Xem thông tin</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="edit-profile-tab" data-toggle="tab" href="#edit-profile" role="tab" aria-controls="edit-profile" aria-selected="false">Cập nhật thông tin</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="profileTabContent">
+                    <div class="tab-pane fade show active" id="view-profile" role="tabpanel" aria-labelledby="view-profile-tab">
+                        <p class="text-gray-600 mb-2"><strong>Họ và tên:</strong> {{user.name_information}}</p>
+                        <p class="text-gray-600 mb-2"><strong>Số điện thoại:</strong> {{user.phone_information}}</p>
+                        <p class="text-gray-600 mb-2"><strong>Email:</strong> {{user.email}}</p>
+                        <p class="text-gray-600 mb-2"><strong>Ngày sinh:</strong> {{user.date_of_birth}}</p>
+                        <form action="/auth/logout" method="GET">
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded mt-4">Đăng xuất</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="edit-profile" role="tabpanel" aria-labelledby="edit-profile-tab">
+                        <form action="/profile/edit" method="POST">
+                            <div class="mb-4">
+                                <label for="name_information" class="block text-gray-700">Họ và tên:</label>
+                                <input type="text" id="name_information" name="name_information" value="{{user.name_information}}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone_information" class="block text-gray-700">Số điện thoại:</label>
+                                <input type="text" id="phone_information" name="phone_information" value="{{user.phone_information}}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700">Email:</label>
+                                <input type="email" id="email" name="email" value="{{user.email}}" class="w-full p-2 border rounded">
+                            </div>
+                            <div class="mb-4">
+                                <label for="date_of_birth" class="block text-gray-700">Ngày sinh:</label>
+                                <input type="date" id="date_of_birth" name="date_of_birth" value="{{user.date_of_birth}}" class="w-full p-2 border rounded">
+                            </div>
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cập nhật</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Thêm JavaScript để quản lý các tab -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#profileTab a'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+</script>
