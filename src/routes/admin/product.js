@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.use(ensureAdmin);
-router.get('/', productController.getAllProducts);
+router.get('/', productController.searchProducts); // Updated route to handle search
 router.post('/', upload.single('image_product'), productController.store);
 router.get('/create', productController.create);
 router.delete('/:id', productController.delete);

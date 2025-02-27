@@ -1,23 +1,32 @@
 <div class="container mx-auto mt-6">
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-gray-100 px-6 py-4 border-b">
-            <h3 class="text-center mb-4 text-2xl font-semibold">Quản Lý Danh Sách Khách Hàng</h3>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-gray-100 px-6 py-4 border-b flex justify-between items-center">
+            <h3 class="text-center text-2xl font-semibold">Quản Lý Danh Sách Khách Hàng</h3>
+            <div class="relative group">
+                <button id="search-toggle" class="text-gray-700 focus:outline-none p-2 rounded-full hover:bg-gray-200 transition">
+                    <i class="fas fa-search text-xl"></i>
+                </button>
+                <form id="search-form" action="/admin/customers" method="GET" class="absolute right-0 top-12 bg-white shadow-lg p-3 rounded-lg flex items-center gap-2 border opacity-0 transform scale-90 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100">
+                    <input type="text" name="name" placeholder="Search by customer name" class="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none transition">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Search</button>
+                </form>
+            </div>
         </div>
-        <div class="p-4 overflow-x-auto">
+        <div class="p-6 overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-200 text-gray-700">
+                    <tr class="bg-blue-500 text-white">
                         <th class="p-3 border-b">STT</th>
-                        <th class="p-3 border-b">Họ Và tên</th>
+                        <th class="p-3 border-b">Họ Và Tên</th>
                         <th class="p-3 border-b">SDT</th>
                         <th class="p-3 border-b">Email</th>
                         <th class="p-3 border-b">Ngày Sinh</th>
                         <th class="p-3 border-b text-center">Action</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-600">
+                <tbody class="text-gray-700">
                     {{#each customers}}
-                    <tr class="hover:bg-gray-100 transition duration-200">
+                    <tr class="hover:bg-blue-100 transition duration-200">
                         <td class="p-3 border-b">{{sum @index 1}}</td>
                         <td class="p-3 border-b">{{#if this.name_information}}{{this.name_information}}{{else}}Chưa điền{{/if}}</td>
                         <td class="p-3 border-b">{{this.phone_information}}</td>
@@ -37,3 +46,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchForm = document.getElementById("search-form");
+        const searchToggle = document.getElementById("search-toggle");
+
+        searchToggle.addEventListener("mouseover", function () {
+            searchForm.classList.add("opacity-100", "scale-100");
+            searchForm.classList.remove("opacity-0", "scale-90");
+        });
+
+        searchForm.addEventListener("mouseleave", function () {
+            searchForm.classList.add("opacity-0", "scale-90");
+            searchForm.classList.remove("opacity-100", "scale-100");
+        });
+    });
+</script>

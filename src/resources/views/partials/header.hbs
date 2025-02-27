@@ -1,6 +1,6 @@
 <!-- Thanh quảng cáo -->
 <div id="ad-banner" class="bg-red-600 text-white text-center py-3 font-bold uppercase tracking-wide text-lg flex items-center justify-center relative shadow-md">
-    <p id="ad-text" class="drop-shadow-md">📢 25.02 ƯU ĐÃI NGẬP TRÀN - DEAL SÁCH RỘN RÀNG! 🚀</p>
+    <p id="ad-text" class="drop-shadow-md">📢 28.02 ƯU ĐÃI NGẬP TRÀN - DEAL SÁCH RỘN RÀNG! 🚀</p>
     <button id="close-ad" class="absolute right-4 text-white font-bold text-xl">&times;</button>
 </div>
 
@@ -8,7 +8,7 @@
 <header class="bg-white shadow-md py-3 px-8 flex items-center justify-between">
     <!-- Logo -->
     <div class="logo flex items-center space-x-2">
-        <a href="#" class="flex items-center text-4xl font-bold tracking-wide text-red-400 italic hover:text-red-500 transition duration-300 ease-in-out font-cursive">
+        <a href="/" class="flex items-center text-4xl font-bold tracking-wide text-red-400 italic hover:text-red-500 transition duration-300 ease-in-out font-cursive">
             <span>Book Haven</span>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 11.1 20.03 11.37 20.27C11.74 20.59 12.26 20.59 12.63 20.27C12.9 20.03 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/>
@@ -17,10 +17,9 @@
     </div>
     
     <!-- Thanh tìm kiếm lớn -->
-    <div class="search-container flex-grow mx-8">
-        <form action="/search" method="GET" class="relative">
-            <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..."
-                class="w-full border border-gray-300 p-3 rounded-full text-lg focus:ring-2 focus:ring-red-400 pl-5 pr-14 outline-none transition duration-200 ease-in-out hover:border-red-400">
+     <div class="search-container flex-grow mx-8">
+        <form id="search-form" action="/search" method="GET" class="relative">
+            <input type="text" id="search-input" name="q" placeholder="Tìm kiếm sản phẩm..." class="w-full border border-gray-300 p-3 rounded-full text-lg focus:ring-2 focus:ring-red-400 pl-5 pr-14 outline-none transition duration-200 ease-in-out hover:border-red-400">
             <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-full transition duration-200 ease-in-out">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>

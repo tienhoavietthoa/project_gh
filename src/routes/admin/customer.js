@@ -7,7 +7,7 @@ const { ensureAdmin } = require('../../app/middleware/authMiddleware');
 router.use(ensureAdmin);
 
 // Routes
-router.get('/', customerController.getAllCustomers);
+router.get('/', customerController.searchCustomers); // Updated route to handle search
 router.delete('/:id', customerController.delete);
 
 module.exports = router;

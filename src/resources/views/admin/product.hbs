@@ -3,6 +3,25 @@
     <div class="container mt-4 col-span-3">
         <h3 class="text-center mb-4 text-2xl font-semibold">Quản Lý Danh Sách Sản Phẩm</h3>
 
+        <!-- Form tìm kiếm sản phẩm -->
+        <div class="relative flex items-center">
+            <!-- Icon tìm kiếm -->
+            <button id="toggleSearch" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition">
+                <i class="fa fa-search text-gray-600"></i>
+            </button>
+
+            <!-- Ô nhập tìm kiếm (ẩn mặc định) -->
+            <form action="/admin/products" method="GET"
+                id="searchForm"
+                class="absolute top-0 left-10 hidden flex items-center bg-white shadow-lg border border-gray-300 rounded-lg">
+                <input type="text" name="name" placeholder="Search by product name"
+                    class="form-control px-4 py-2 w-60 outline-none border-none">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-r-lg">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+
         <!-- Nút tạo sản phẩm mới -->
         <div class="mb-4">
             <a href="/admin/products/create" class="btn btn-primary d-flex align-items-center w-fit">
@@ -57,7 +76,7 @@
                                     </button>
                                 </form>
                             </td>
-                        </tr>   
+                        </tr>
                     {{/each}}
                 </tbody>
             </table>
@@ -81,7 +100,7 @@
                     {{#each (range 1 totalPages)}}
                         <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
                             <a class="page-link flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-gray-600 hover:bg-blue-500 hover:text-white transition 
-                                   {{#if (eq this ../currentPage)}}bg-blue-500 text-white font-bold shadow-md{{/if}}"
+                                      {{#if (eq this ../currentPage)}}bg-blue-500 text-white font-bold shadow-md{{/if}}"
                                href="?page={{this}}">
                                 {{this}}
                             </a>
@@ -115,5 +134,26 @@
                 });
             });
         </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toggleSearch = document.getElementById("toggleSearch");
+                const searchForm = document.getElementById("searchForm");
+
+                toggleSearch.addEventListener("click", function (event) {
+                    event.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                    searchForm.classList.toggle("hidden");
+                    searchForm.classList.toggle("flex");
+                });
+
+                // Ẩn ô tìm kiếm khi click ra ngoài
+                document.addEventListener("click", function (event) {
+                    if (!searchForm.contains(event.target) && event.target !== toggleSearch) {
+                        searchForm.classList.add("hidden");
+                        searchForm.classList.remove("flex");
+                    }
+                });
+            });
+            </script>
+
     </div>
 </section>

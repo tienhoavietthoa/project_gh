@@ -1,16 +1,40 @@
-<section class="p-8 bg-gray-50">
+<section class="p-10 bg-gray-100">
     <div class="container mx-auto">
-        <nav class="navbar navbar-light bg-light flex justify-center mb-6">
-            <a class="navbar-brand" href="#" style="font-family: 'Great Vibes', cursive; font-size: 2rem; color: #d76d77;">
+        <!-- Navbar -->
+        <nav class="navbar navbar-light bg-white shadow-md flex justify-center p-4 rounded-lg mb-8">
+            <a class="text-3xl font-semibold text-indigo-600" href="#" style="font-family: 'Great Vibes', cursive; font-size: 2rem; color: #d76d77;">
                 Welcome to BookHaven
             </a>
         </nav>
 
+        <!-- Banner -->
+        <div class="banner relative h-[70vh] mb-12 rounded-lg overflow-hidden shadow-lg">
+            <img src="img/h3.jpg" alt="Banner" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-4xl font-bold">
+                Hello 
+            </div>
+        </div>
+
+        <!-- Hidden Toolbar -->
+        <div class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-lg p-3 transition-all duration-300 z-50">
+            <button id="toggle-toolbar" class="flex items-center bg-red-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+            <div id="toolbar-content" class="hidden mt-4 space-y-2">
+                {{#each categories}}
+                    <a href="#category-{{@index}}" class="block py-2 px-4 rounded-md text-gray-800 hover:bg-indigo-100 transition">{{this.name_category}}</a>
+                {{/each}}
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm theo danh mục -->
         {{#each categories}}
-            <div class="category-section mb-10">
+            <div id="category-{{@index}}" class="category-section mb-10">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">{{this.name_category}}</h2>
 
-                <div class="relative">
+                <div class="relative overflow-hidden">
                     <!-- Nút mũi tên trái -->
                     <button class="prev-btn absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow-lg hover:bg-gray-200 transition z-10 hidden">
                         ❮
@@ -19,15 +43,19 @@
                     <div class="overflow-hidden w-full">
                         <div class="product-slider flex gap-6 transition-transform duration-500 ease-in-out" data-category="{{@index}}">
                             {{#each this.products}}
-                                <div class="product-card w-72 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transform transition hover:-translate-y-1">
-                                    <img src="{{this.image_product}}" alt="{{this.name_product}}" class="w-full h-60 object-cover">
-                                    <div class="p-4 text-center">
-                                        <h3 class="text-lg font-medium text-gray-800">{{this.name_product}}</h3>
-                                        <p class="text-red-500 font-semibold mt-2 text-lg">{{this.price}} VND</p>
-                                        <a href="/products/{{this.id_product}}" class="inline-block mt-3 px-5 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
-                                            Xem chi tiết
-                                        </a>
+                                <div class="product-card w-1/3 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transform transition hover:-translate-y-1 relative p-4">
+                                    <img src="{{this.image_product}}" alt="{{this.name_product}}" class="w-full h-60 object-cover rounded-md">
+                                    <div class="p-4 flex justify-between items-center">
+                                        <h3 class="text-lg font-semibold text-gray-900">{{this.name_product}}</h3>
+                                        <p class="text-red-600 font-semibold text-lg">{{this.price}} VND</p>
                                     </div>
+                                    <a href="/products/{{this.id_product}}" class="absolute bottom-3 right-3 bg-red-300 text-white p-2 rounded-full hover:bg-red-400 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                    </a>
                                 </div>
                             {{/each}}
                         </div>
@@ -45,6 +73,15 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Toggle toolbar content visibility
+        const toggleButton = document.getElementById("toggle-toolbar");
+        const toolbarContent = document.getElementById("toolbar-content");
+
+        toggleButton.addEventListener("click", function () {
+            toolbarContent.classList.toggle("hidden");
+        });
+
+        // Product slider functionality
         document.querySelectorAll(".category-section").forEach((section) => {
             let slider = section.querySelector(".product-slider");
             let nextBtn = section.querySelector(".next-btn");
@@ -52,8 +89,8 @@
 
             let currentIndex = 0;
             let productCount = slider.children.length;
-            let visibleItems = Math.min(3, productCount); // Hiển thị tối đa 3 sản phẩm
-            let maxIndex = productCount - visibleItems;
+            let visibleItems = 3;
+            let maxIndex = Math.max(0, productCount - visibleItems);
 
             function updateSlider() {
                 let offset = -currentIndex * (100 / visibleItems);

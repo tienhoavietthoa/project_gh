@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Product = require('../../../models/product');
 const Category = require('../../../models/category');
 const path = require('path');
@@ -11,6 +12,32 @@ const productController = {
             const offset = (page - 1) * limit;
 
             const { rows: products, count } = await Product.findAndCountAll({
+                limit: limit,
+                offset: offset
+            });
+
+            const totalPages = Math.ceil(count / limit);
+
+            res.render('admin/product', { products, currentPage: page, totalPages: totalPages });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+    searchProducts: async function (req, res) {
+        const { name } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 3;
+        const offset = (page - 1) * limit;
+        let query = {};
+
+        if (name) {
+            query.name_product = { [Op.like]: `%${name}%` };
+        }
+
+        try {
+            const { rows: products, count } = await Product.findAndCountAll({
+                where: query,
                 limit: limit,
                 offset: offset
             });

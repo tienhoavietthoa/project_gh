@@ -1,0 +1,26 @@
+{{! Ensure this file uses the 'home' layout }}
+{{!< layout='home' }}
+
+<section class="p-10 bg-gray-100">
+    <div class="container mx-auto">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Search Results</h2>
+        <div class="grid grid-cols-3 gap-6">
+            {{#each products}}
+                <div class="product-card bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transform transition hover:-translate-y-1 relative p-4">
+                    <img src="{{this.image_product}}" alt="{{this.name_product}}" class="w-full h-60 object-cover rounded-md">
+                    <div class="p-4 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">{{this.name_product}}</h3>
+                        <p class="text-red-600 font-semibold text-lg">{{this.price}} VND</p>
+                    </div>
+                    <a href="/products/{{this.id_product}}" class="absolute bottom-3 right-3 bg-red-300 text-white p-2 rounded-full hover:bg-red-400 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</section>

@@ -6,10 +6,12 @@ const customerRouter = require('./admin/customer');
 const dashboardRouter = require('./admin/dashboard');
 const clientAuthRoutes = require('./client/auth');
 const { ensureCustomer } = require('../app/middleware/authMiddleware');
+const contactRouter = require('./client/contact');
 
 // Home route
 router.get('/', homeController.index);
-
+router.get('/search', homeController.search);
+router.use('/contact', contactRouter); // Sử dụng route liên hệ
 // Sử dụng các route
 router.use('/admin/products', productRouter);
 router.use('/admin/customers', customerRouter);

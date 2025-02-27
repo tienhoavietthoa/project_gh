@@ -1,6 +1,7 @@
 const Product = require('../../models/product');
 const Category = require('../../models/category');
 const Information = require('../../models/informations');
+const { Op } = require('sequelize');
 
 // Thiết lập quan hệ
 Category.hasMany(Product, { foreignKey: 'id_category' });
@@ -15,6 +16,24 @@ const homeController = {
                 }
             });
             res.render('home', { layout: 'home', categories: categories });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+    search: async function (req, res) {
+        try {
+            const searchTerm = req.query.q;
+            if (!searchTerm) {
+                return res.render('home', { layout: 'home', categories: [] });
+            }
+            const products = await Product.findAll({
+                where: {
+                    name_product: {
+                        [Op.like]: `%${searchTerm}%`
+                    }
+                }
+            });
+            res.render('customer/searchResults', { layout: 'home', products });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
