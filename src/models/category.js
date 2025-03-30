@@ -16,7 +16,7 @@ Category.init({
 }, { 
     sequelize, 
     modelName: 'category',
-    timestamps: false // Tắt tự động tạo các cột createdAt và updatedAt
+    timestamps: false 
 });
 
 module.exports = Category;

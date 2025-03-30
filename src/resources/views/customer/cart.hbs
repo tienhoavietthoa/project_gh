@@ -1,49 +1,87 @@
-<section class="p-8 bg-gray-50">
-    <div class="container mx-auto">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Giỏ hàng của bạn</h2>
+{{!< home }}
+
+<section class="p-8 bg-gray-100">
+    <div class="container mx-auto max-w-5xl bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 border-b pb-4">🛒 Giỏ hàng của bạn</h2>
+
         {{#if cart.length}}
             <form action="/cart/update" method="POST">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-200 text-gray-700">
-                            <th class="p-3 border-b">Sản phẩm</th>
-                            <th class="p-3 border-b">Giá</th>
-                            <th class="p-3 border-b">Số lượng</th>
-                            <th class="p-3 border-b">Tổng</th>
-                            <th class="p-3 border-b text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-gray-600">
-                        {{#each cart}}
-                        <tr class="hover:bg-gray-100 transition duration-200">
-                            <td class="p-3 border-b flex items-center">
-                                <img src="{{this.image}}" alt="{{this.name}}" class="w-20 h-20 object-cover mr-4">
-                                <span>{{this.name}}</span>
-                            </td>
-                            <td class="p-3 border-b">{{this.price}} VND</td>
-                            <td class="p-3 border-b">
-                                <input type="number" name="quantity" value="{{this.quantity}}" class="w-16 p-2 border rounded">
-                                <input type="hidden" name="productId" value="{{this.productId}}">
-                            </td>
-                            <td class="p-3 border-b">{{multiply this.price this.quantity}} VND</td>
-                            <td class="p-3 border-b text-center">
-                                <form action="/cart/remove" method="POST" style="display: inline;">
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse mt-4">
+                        <thead>
+                            <tr class="bg-gray-200 text-gray-700 text-sm">
+                                <th class="p-3 border-b">Sản phẩm</th>
+                                <th class="p-3 border-b text-center">Đơn giá</th>
+                                <th class="p-3 border-b text-center">Số lượng</th>
+                                <th class="p-3 border-b text-center">Thành tiền</th>
+                                <th class="p-3 border-b text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            {{#each cart}}
+                            <tr class="border-b hover:bg-gray-100 transition">
+                                <td class="p-3 flex items-center">
+                                    <img src="{{this.image}}" alt="{{this.name}}" class="w-20 h-20 object-cover rounded mr-4 shadow-sm">
+                                    <div>
+                                        <span class="font-medium text-gray-800">{{this.name}}</span>
+                                        <p class="text-xs text-gray-500">Mã SP: {{this.productId}}</p>
+                                    </div>
+                                </td>
+                                <td class="p-3 text-center text-blue-600 font-semibold">{{formatCurrency this.price}} VND</td>
+                                <td class="p-3 text-center">
+                                    <input type="number" name="quantity" value="{{this.quantity}}" min="1"
+                                           class="w-16 p-2 border rounded text-center shadow-sm">
                                     <input type="hidden" name="productId" value="{{this.productId}}">
-                                    <button type="submit" class="text-red-500 hover:text-red-700 transition duration-200">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-                <div class="text-right mt-6">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cập nhật giỏ hàng</button>
+                                </td>
+                                <td class="p-3 text-center text-green-600 font-semibold">{{formatCurrency (multiply this.price this.quantity)}} VND</td>
+                                <td class="p-3 text-center">
+                                    <form action="/cart/remove" method="POST">
+                                        <input type="hidden" name="productId" value="{{this.productId}}">
+                                        <button type="submit" class="text-red-500 hover:text-red-700 transition">
+                                            <i class="fas fa-trash-alt text-lg"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Chức năng cập nhật giỏ hàng -->
+                <div class="flex justify-between items-center mt-6">
+                    <a href="/" class="text-blue-500 hover:underline flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Tiếp tục mua sắm
+                    </a>
+                    <button type="submit" class="bg-blue-500 text-white px-5 py-2 rounded shadow-md hover:bg-blue-600 transition">
+                        <i class="fas fa-sync-alt"></i> Cập nhật giỏ hàng
+                    </button>
                 </div>
             </form>
+
+            <!-- Tổng tiền & Thanh toán -->
+            <div class="bg-gray-100 p-4 rounded-lg shadow-md mt-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold text-gray-700">Tổng tiền:</span>
+                    <span class="text-2xl font-bold text-green-600">{{formatCurrency total}} VND</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Phí vận chuyển sẽ được tính trong bước tiếp theo.</p>
+            </div>
+
+            <div class="text-right mt-6">
+                <form action="/cart/place-order" method="POST">
+                    <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded shadow-md hover:bg-green-600 transition text-lg">
+                        <i class="fas fa-credit-card"></i> Đặt hàng ngay
+                    </button>
+                </form>
+            </div>
         {{else}}
-            <p class="text-gray-600">Giỏ hàng của bạn hiện đang trống.</p>
+            <p class="text-center text-gray-500 text-lg">🛒 Giỏ hàng của bạn hiện đang trống.</p>
+            <div class="text-center mt-4">
+                <a href="/" class="text-blue-500 hover:underline flex items-center justify-center">
+                    <i class="fas fa-shopping-cart mr-2"></i> Quay lại mua sắm
+                </a>
+            </div>
         {{/if}}
     </div>
 </section>

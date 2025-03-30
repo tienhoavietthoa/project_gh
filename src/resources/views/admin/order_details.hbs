@@ -1,0 +1,32 @@
+<h2 class="text-2xl font-bold text-gray-800 mb-4">🛒 Chi tiết đơn hàng</h2>
+
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="px-6 py-3 text-left text-gray-700 border-b">ID Sản phẩm</th>
+                <th class="px-6 py-3 text-left text-gray-700 border-b">Tên sản phẩm</th>
+                <th class="px-6 py-3 text-center text-gray-700 border-b">Số lượng</th>
+                <th class="px-6 py-3 text-right text-gray-700 border-b">Giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each orderDetails}}
+            <tr class="border-b hover:bg-gray-100 transition">
+                <td class="px-6 py-3 text-gray-800">{{this.id_product}}</td>
+                <td class="px-6 py-3 text-gray-800">{{this.name_product}}</td>
+                <td class="px-6 py-3 text-center text-gray-800">{{this.quantity_detail}}</td>
+                <td class="px-6 py-3 text-right text-gray-800">{{this.price_detail}} đ</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<!-- Nút quay lại danh sách đơn hàng -->
+<div class="mt-6 flex justify-end">
+    <a href="/admin/orders"
+        class="px-6 py-3 bg-pink-300 text-gray-800 font-semibold rounded-lg shadow hover:bg-pink-400 transition">
+        🔙 Quay lại danh sách đơn hàng
+    </a>
+</div>

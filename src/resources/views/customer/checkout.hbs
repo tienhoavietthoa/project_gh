@@ -1,0 +1,22 @@
+<form id="checkoutForm" method="POST" action="/order/checkout">
+    <div>
+        <label for="name_order">Name</label>
+        <input type="text" id="name_order" name="name_order" required>
+    </div>
+    <div>
+        <label for="phone_order">Phone</label>
+        <input type="text" id="phone_order" name="phone_order" required>
+    </div>
+    <div>
+        <label for="address_order">Address</label>
+        <input type="text" id="address_order" name="address_order" required>
+    </div>
+    <div>
+        <label for="payment">Payment Method</label>
+        <select id="payment" name="payment" required>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+        </select>
+    </div>
+    <button type="submit">Place Order</button>
+</form>
+<script src="/js/checkout.js"></script>

@@ -4,8 +4,10 @@ const Information = require('../../../models/informations');
 const dashboardController = {
     getDashboard: async function (req, res) {
         try {
-            const totalProducts = await Product.count();
-            const totalCustomers = await Information.count();
+            const [totalProducts, totalCustomers] = await Promise.all([
+                Product.count(),
+                Information.count()
+            ]);
 
             res.render('admin/dashboard', { 
                 layout: 'main', 

@@ -5,27 +5,28 @@ const productRouter = require('./admin/product');
 const customerRouter = require('./admin/customer');
 const dashboardRouter = require('./admin/dashboard');
 const clientAuthRoutes = require('./client/auth');
-const { ensureCustomer } = require('../app/middleware/authMiddleware');
+const cartRoutes = require('./client/cart');
 const contactRouter = require('./client/contact');
+const orderRoutes = require('./client/order'); // Thêm dòng này
+const adminOrdersRouter = require('./admin/orders'); // Thêm dòng này
+const { ensureCustomer, ensureAdmin } = require('../app/middleware/authMiddleware');
 
 // Home route
 router.get('/', homeController.index);
 router.get('/search', homeController.search);
 router.use('/contact', contactRouter); // Sử dụng route liên hệ
 // Sử dụng các route
-router.use('/admin/products', productRouter);
-router.use('/admin/customers', customerRouter);
-router.use('/admin/dashboard', dashboardRouter);
+router.use('/admin/products', ensureAdmin, productRouter);
+router.use('/admin/customers', ensureAdmin, customerRouter);
+router.use('/admin/dashboard', ensureAdmin, dashboardRouter);
+router.use('/admin/orders', ensureAdmin, adminOrdersRouter); // Thêm dòng này
 router.use('/auth', clientAuthRoutes);
+router.use('/cart', ensureCustomer, cartRoutes);
+router.use('/order', ensureCustomer, orderRoutes); // Thêm dòng này
 
 // Add middleware to protect specific routes
-router.get('/cart', ensureCustomer, (req, res) => {
-    res.render('cart', { layout: 'main' });
-});
-
 router.get('/profile', ensureCustomer, homeController.profile);
 router.post('/profile/edit', ensureCustomer, homeController.updateProfile);
-
 router.get('/products/:id', ensureCustomer, homeController.productDetail);
 
 module.exports = router;

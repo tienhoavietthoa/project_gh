@@ -29,7 +29,8 @@
                         <button onclick="goBack()" class="bg-gray-500 text-white px-5 py-2 rounded-md shadow-md hover:bg-gray-600 transition">
                             ← Quay lại
                         </button>
-                        <form action="/cart/add/{{product.id_product}}" method="POST">
+                        <form action="/cart/add" method="POST">
+                            <input type="hidden" name="productId" value="{{product.id_product}}">
                             <button type="submit" class="bg-red-600 text-white px-5 py-2 rounded-md shadow-md hover:bg-red-700 transition">
                                 🛒 Thêm vào giỏ hàng
                             </button>

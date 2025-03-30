@@ -11,10 +11,10 @@ const productController = {
             const limit = 3;
             const offset = (page - 1) * limit;
 
-            const { rows: products, count } = await Product.findAndCountAll({
-                limit: limit,
-                offset: offset
-            });
+            const [products, count] = await Promise.all([
+                Product.findAll({ limit: limit, offset: offset }),
+                Product.count()
+            ]);
 
             const totalPages = Math.ceil(count / limit);
 
@@ -36,11 +36,10 @@ const productController = {
         }
 
         try {
-            const { rows: products, count } = await Product.findAndCountAll({
-                where: query,
-                limit: limit,
-                offset: offset
-            });
+            const [products, count] = await Promise.all([
+                Product.findAll({ where: query, limit: limit, offset: offset }),
+                Product.count({ where: query })
+            ]);
 
             const totalPages = Math.ceil(count / limit);
 
@@ -95,8 +94,10 @@ const productController = {
         const id = req.params.id;
 
         try {
-            const product = await Product.findByPk(id);
-            const categories = await Category.findAll();
+            const [product, categories] = await Promise.all([
+                Product.findByPk(id),
+                Category.findAll()
+            ]);
             res.render('admin/editProduct', { product, categories });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -113,10 +114,8 @@ const productController = {
                 { name_product, price, image_product, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category },
                 { where: { id_product: id } }
             );
-            console.log("Cập nhật thành công!");
             res.redirect('/admin/products');
         } catch (err) {
-            console.error("Lỗi khi cập nhật:", err);
             res.status(500).json({ error: err.message });
         }
     },

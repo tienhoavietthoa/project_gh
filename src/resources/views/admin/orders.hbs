@@ -1,0 +1,62 @@
+<div class="container mx-auto mt-6">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-gray-100 px-6 py-4 border-b">
+            <h3 class="text-center mb-4 text-2xl font-semibold">Quản Lý Danh Sách Đơn Hàng</h3>
+        </div>
+        <div class="p-4 overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-700">
+                        <th class="p-3 border-b">STT</th>
+                        <th class="p-3 border-b">Tên Khách Hàng</th>
+                        <th class="p-3 border-b">SĐT</th>
+                        <th class="p-3 border-b">Địa Chỉ</th>
+                        <th class="p-3 border-b">Phương Thức Thanh Toán</th>
+                        <th class="p-3 border-b">Tổng Tiền (VNĐ)</th>
+                        <th class="p-3 border-b">Ngày Đặt Hàng</th>
+                        <th class="p-3 border-b text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600">
+                    {{#each orders}}
+                    <tr class="hover:bg-gray-100 transition duration-200">
+                        <td class="p-3 border-b text-center">{{sum @index 1}}</td>
+                        <td class="p-3 border-b">{{this.name_order}}</td>
+                        <td class="p-3 border-b">{{this.phone_order}}</td>
+                        <td class="p-3 border-b">{{this.address_order}}</td>
+                        <td class="p-3 border-b">{{this.payment}}</td>
+                        <td class="p-3 border-b font-bold text-green-600">{{this.total}}</td>
+                        <td class="p-3 border-b">{{this.date_order}}</td>
+                        <td class="p-3 border-b text-center">
+                            <div class="flex justify-center gap-2">
+                                <!-- Nút xem chi tiết đơn hàng -->
+                                <a href="/admin/orders/details/{{this.id_order}}" 
+                                   class="text-green-500 hover:text-green-700 transition duration-200"
+                                   title="Xem Chi Tiết">
+                                    <i class="fas fa-list"></i>
+                                </a>
+                                <!-- Nút xem đơn hàng -->
+                                <a href="/admin/orders/{{this.id_order}}" 
+                                   class="text-blue-500 hover:text-blue-700 transition duration-200"
+                                   title="Xem Đơn Hàng">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <!-- Nút xóa đơn hàng -->
+                                <form action="/admin/orders/{{this.id_order}}?_method=DELETE" method="POST">
+                                    <button type="submit" class="text-red-500 hover:text-red-700 transition duration-200" title="Xóa Đơn Hàng">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="8" class="text-center text-gray-500 p-4">Không có đơn hàng nào.</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

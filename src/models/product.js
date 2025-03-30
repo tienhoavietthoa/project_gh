@@ -3,7 +3,8 @@ const sequelize = require('../config/connectDB');
 
 class Product extends Model {}
 
-Product.init({
+
+Product.init({ 
     id_product: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -64,7 +65,7 @@ Product.init({
 }, { 
     sequelize, 
     modelName: 'product',
-    timestamps: false // Tắt tự động tạo các cột createdAt và updatedAt
+    timestamps: false 
 });
 
 module.exports = Product;

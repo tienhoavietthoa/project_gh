@@ -6,7 +6,8 @@ const contactController = {
             const { name_contact, phone_contact, text_contact } = req.body;
             const date_contact = new Date();
             await Contact.create({ name_contact, phone_contact, text_contact, date_contact });
-            res.status(201).json({ message: 'Liên hệ đã được gửi thành công' });
+            // Redirect to homepage after successful submission
+            res.redirect('/');
         } catch (err) {
             res.status(500).json({ error: err.message });
         }

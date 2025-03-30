@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/connectDB'); // Đảm bảo đường dẫn là chính xác
+const sequelize = require('../config/connectDB');
 
 const Contact = sequelize.define('Contact', {
     id_contact: {

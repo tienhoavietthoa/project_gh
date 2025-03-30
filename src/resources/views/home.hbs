@@ -16,18 +16,21 @@
         </div>
 
         <!-- Hidden Toolbar -->
-        <div class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-lg p-3 transition-all duration-300 z-50">
-            <button id="toggle-toolbar" class="flex items-center bg-red-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="fixed left-2 top-1/2 transform -translate-y-1/2 bg-white shadow-md rounded-md p-2 transition-all duration-300 z-50 scale-90">
+            <button id="toggle-toolbar" class="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
             </button>
-            <div id="toolbar-content" class="hidden mt-4 space-y-2">
+            <div id="toolbar-content" class="hidden mt-2 space-y-1">
                 {{#each categories}}
-                    <a href="#category-{{@index}}" class="block py-2 px-4 rounded-md text-gray-800 hover:bg-indigo-100 transition">{{this.name_category}}</a>
+                    <a href="#category-{{@index}}" class="block py-1 px-3 rounded text-gray-700 hover:bg-indigo-100 transition text-sm">
+                        {{this.name_category}}
+                    </a>
                 {{/each}}
             </div>
         </div>
+
 
         <!-- Danh sách sản phẩm theo danh mục -->
         {{#each categories}}

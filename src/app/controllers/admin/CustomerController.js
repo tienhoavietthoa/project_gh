@@ -1,12 +1,16 @@
 const { Op } = require('sequelize');
 const Information = require('../../../models/informations');
 const customerController = {
-    getAllCustomers: function(req, res) {
-        Information.findAll()
-            .then(customers => res.render('admin/customer', { customers }))  // Render HTML
-            .catch(err => res.status(500).json({ error: err.message }));
+    getAllCustomers: async function (req, res) {
+        try {
+            const customers = await Information.findAll();
+            res.render('admin/customer', { customers });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
     },
-    searchCustomers: async function(req, res) {
+
+    searchCustomers: async function (req, res) {
         const { name } = req.query;
         let query = {};
 
@@ -21,11 +25,17 @@ const customerController = {
             res.status(500).json({ error: err.message });
         }
     },
-    delete: function(req, res) {
+
+    delete: async function (req, res) {
         const id = req.params.id;
-        Information.destroy({ where: { id_information: id } })
-            .then(() => res.redirect('/admin/customers'))  // Redirect sau khi xóa
-            .catch(err => res.status(500).json({ error: err.message }));
+
+        try {
+            await Information.destroy({ where: { id_information: id } });
+            res.redirect('/admin/customers');
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
     }
 };
+
 module.exports = customerController;
