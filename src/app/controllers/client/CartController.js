@@ -4,11 +4,9 @@ const cartController = {
     addToCart: async function (req, res) {
         const productId = parseInt(req.body.productId);
         const quantity = parseInt(req.body.quantity) || 1;
-
         if (!req.session.cart) {
             req.session.cart = [];
         }
-
         let cartItemIndex = req.session.cart.findIndex(item => item.productId === productId);
         if (cartItemIndex !== -1) {
             req.session.cart[cartItemIndex].quantity += quantity;
@@ -29,7 +27,6 @@ const cartController = {
                 return res.status(500).send('Lỗi hệ thống!');
             }
         }
-
         req.session.save(err => {
             if (err) {
                 console.error('❌ Lỗi khi lưu session:', err);

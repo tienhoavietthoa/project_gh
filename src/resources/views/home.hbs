@@ -8,61 +8,62 @@
         </nav>
 
         <!-- Banner -->
-        <div class="banner relative h-[70vh] mb-12 rounded-lg overflow-hidden shadow-lg">
-            <img src="img/h3.jpg" alt="Banner" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-4xl font-bold">
-                Hello 
-            </div>
+        <div class="relative h-[70vh] mb-12 rounded-lg overflow-hidden shadow-lg">
+        <img src="img/h3.jpg" alt="Banner" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white text-center p-6">
+            <h1 class="text-4xl font-bold">Chào mừng bạn đến với BookHaven</h1>
+            <p class="text-lg mt-2">Khám phá hàng ngàn cuốn sách hấp dẫn ngay hôm nay!</p>
+            <a href="#" class="">
+                Mua ngay
+            </a>
         </div>
+    </div>
+    <!-- Hidden Toolbar -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-lg p-3 transition-all duration-300 z-50">
+        <button id="toggle-toolbar" class="flex items-center bg-red-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+        <div id="toolbar-content" class="hidden mt-4 space-y-2">
+            <button id="close-toolbar" class="text-red-600 hover:text-red-800">Đóng</button>
+            {{#each categories}}
+                <a href="#category-{{@index}}" class="block py-2 px-4 rounded-md text-gray-800 hover:bg-indigo-100 transition">{{this.name_category}}</a>
+            {{/each}}
+        </div>
+    </div>
 
-        <!-- Hidden Toolbar -->
-        <div class="fixed left-2 top-1/2 transform -translate-y-1/2 bg-white shadow-md rounded-md p-2 transition-all duration-300 z-50 scale-90">
-            <button id="toggle-toolbar" class="flex items-center bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
-            <div id="toolbar-content" class="hidden mt-2 space-y-1">
-                {{#each categories}}
-                    <a href="#category-{{@index}}" class="block py-1 px-3 rounded text-gray-700 hover:bg-indigo-100 transition text-sm">
-                        {{this.name_category}}
+    <!-- Danh sách sản phẩm theo danh mục -->
+    {{#each categories}}
+        <div id="category-{{@index}}" class="category-section mb-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">{{this.name_category}}</h2>
+
+            <div class="relative overflow-hidden">
+                <!-- Nút mũi tên trái -->
+                <button class="prev-btn absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow-lg hover:bg-gray-200 transition z-10 hidden">
+                    ❮
+                </button>
+
+        <div class="overflow-x-auto whitespace-nowrap scroll-smooth w-full relative">
+            <div class="product-slider flex gap-6 transition-transform duration-500 ease-in-out">
+                {{#each this.products}}
+                <div class="product-card flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transform transition hover:-translate-y-1 min-w-[200px] max-w-[300px] p-4">
+                    <img src="{{this.image_product}}" alt="{{this.name_product}}" class="w-full h-60 object-cover rounded-md">
+                    <div class="p-4 flex flex-col items-start"> 
+                        <h3 class="text-lg font-semibold text-gray-900 h-12 line-clamp-2">{{this.name_product}}</h3>
+                        <p class="text-red-600 font-semibold text-lg">{{this.price}} VND</p>
+                    </div>
+                    <a href="/products/{{this.id_product}}" class="absolute bottom-3 right-3 bg-red-300 text-white p-2 rounded-full hover:bg-red-400 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
                     </a>
+                </div>
                 {{/each}}
             </div>
         </div>
-
-
-        <!-- Danh sách sản phẩm theo danh mục -->
-        {{#each categories}}
-            <div id="category-{{@index}}" class="category-section mb-10">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">{{this.name_category}}</h2>
-
-                <div class="relative overflow-hidden">
-                    <!-- Nút mũi tên trái -->
-                    <button class="prev-btn absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow-lg hover:bg-gray-200 transition z-10 hidden">
-                        ❮
-                    </button>
-
-                    <div class="overflow-hidden w-full">
-                        <div class="product-slider flex gap-6 transition-transform duration-500 ease-in-out" data-category="{{@index}}">
-                            {{#each this.products}}
-                                <div class="product-card w-1/3 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transform transition hover:-translate-y-1 relative p-4">
-                                    <img src="{{this.image_product}}" alt="{{this.name_product}}" class="w-full h-60 object-cover rounded-md">
-                                    <div class="p-4 flex justify-between items-center">
-                                        <h3 class="text-lg font-semibold text-gray-900">{{this.name_product}}</h3>
-                                        <p class="text-red-600 font-semibold text-lg">{{this.price}} VND</p>
-                                    </div>
-                                    <a href="/products/{{this.id_product}}" class="absolute bottom-3 right-3 bg-red-300 text-white p-2 rounded-full hover:bg-red-400 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                        </svg>
-                                    </a>
-                                </div>
-                            {{/each}}
-                        </div>
-                    </div>
 
                     <!-- Nút mũi tên phải -->
                     <button class="next-btn absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-full shadow-lg hover:bg-gray-200 transition z-10 hidden">
@@ -71,6 +72,7 @@
                 </div>
             </div>
         {{/each}}
+
     </div>
 </section>
 
@@ -79,20 +81,44 @@
         // Toggle toolbar content visibility
         const toggleButton = document.getElementById("toggle-toolbar");
         const toolbarContent = document.getElementById("toolbar-content");
-
-        toggleButton.addEventListener("click", function () {
+        const closeToolbar = document.getElementById("close-toolbar");
+        
+       toggleButton.addEventListener("click", function (event){
             toolbarContent.classList.toggle("hidden");
+            event.stopPropagation();
         });
-
+        closeToolbar.addEventListener("click", function(){
+            toolbarContent.classList.add("-translate-x-full");
+        });
+        // Đóng menu khi chọn một thể loại sách
+        document.querySelectorAll("#toolbar-content a").forEach(link => {
+            link.addEventListener("click", function () {
+                toolbarContent.classList.add("hidden"); 
+            });
+        });
+        // Đóng menu khi bấm ra ngoài
+        document.addEventListener("click", function (event) {
+            if (!toolbarContent.contains(event.target) && !toggleButton.contains(event.target)) {
+                toolbarContent.classList.add("hidden");
+            }
+        });
+        // Hide toolbar when a category is selected
+        const categoryLinks = toolbarContent.querySelectorAll("a");
+        categoryLinks.forEach(link => {
+            link.addEventListener("click", function () {
+                toolbarContent.classList.add("hidden"); // Ẩn menu khi chọn thể loại
+            });
+        });
         // Product slider functionality
         document.querySelectorAll(".category-section").forEach((section) => {
             let slider = section.querySelector(".product-slider");
             let nextBtn = section.querySelector(".next-btn");
             let prevBtn = section.querySelector(".prev-btn");
+            let dots = document.querySelectorAll(".dot");
 
             let currentIndex = 0;
             let productCount = slider.children.length;
-            let visibleItems = 3;
+            let visibleItems = 4;
             let maxIndex = Math.max(0, productCount - visibleItems);
 
             function updateSlider() {
@@ -100,8 +126,10 @@
                 slider.style.transform = `translateX(${offset}%)`;
                 prevBtn.classList.toggle("hidden", currentIndex === 0);
                 nextBtn.classList.toggle("hidden", currentIndex >= maxIndex);
-            }
-
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle("bg-gray-800", index === currentIndex);
+                });
+            }   
             nextBtn.addEventListener("click", function () {
                 if (currentIndex < maxIndex) {
                     currentIndex++;
@@ -120,5 +148,27 @@
                 nextBtn.classList.remove("hidden");
             }
         });
+      dots.forEach((dot, index) => {
+            dot.addEventListener("click", function () {
+                currentIndex = index;
+                updateSlider();
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            let maxHeight = 0;
+            const productCards = document.querySelectorAll(".product-card");
+
+            // Tìm chiều cao lớn nhất
+            productCards.forEach(card => {
+                let height = card.offsetHeight;
+                if (height > maxHeight) maxHeight = height;
+            });
+
+            // Gán chiều cao lớn nhất cho tất cả thẻ
+            productCards.forEach(card => {
+                card.style.height = maxHeight + "px";
+            });
+        });
+        updateSlider();
     });
 </script>

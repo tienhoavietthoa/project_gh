@@ -23,7 +23,6 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
-
     searchProducts: async function (req, res) {
         const { name } = req.query;
         const page = parseInt(req.query.page) || 1;
@@ -48,7 +47,6 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
-
     create: async function (req, res) {
         try {
             const categories = await Category.findAll();
@@ -57,7 +55,6 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
-
     store: async function (req, res) {
         const { name_product, price, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category } = req.body;
         const image_product = req.file ? `/img/${req.file.filename}` : null;
@@ -71,7 +68,6 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
-
     delete: async function (req, res) {
         const id = req.params.id;
 
@@ -89,7 +85,6 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
-
     edit: async function (req, res) {
         const id = req.params.id;
 
