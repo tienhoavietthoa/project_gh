@@ -10,14 +10,17 @@ const productController = {
             const page = parseInt(req.query.page) || 1;
             const limit = 3;
             const offset = (page - 1) * limit;
-
+    
             const [products, count] = await Promise.all([
                 Product.findAll({ limit: limit, offset: offset }),
                 Product.count()
             ]);
-
+    
             const totalPages = Math.ceil(count / limit);
-
+    
+            // Log dữ liệu products ra console
+            console.log('Products:', products);
+    
             res.render('admin/product', { products, currentPage: page, totalPages: totalPages });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -58,7 +61,7 @@ const productController = {
     store: async function (req, res) {
         const { name_product, price, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category } = req.body;
         const image_product = req.file ? `/img/${req.file.filename}` : null;
-
+    
         try {
             await Product.create({
                 name_product, price, image_product, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category
@@ -68,6 +71,7 @@ const productController = {
             res.status(500).json({ error: err.message });
         }
     },
+    
     delete: async function (req, res) {
         const id = req.params.id;
 
@@ -101,9 +105,15 @@ const productController = {
 
     update: async function (req, res) {
         const id = req.params.id;
-        const { name_product, price, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category } = req.body;
-        const image_product = req.file ? `/img/${req.file.filename}` : req.body.existing_image_product;
-
+        const { name_product, price, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category, existing_image_product } = req.body;
+        
+        let image_product = existing_image_product; // Mặc định giữ ảnh cũ nếu không upload ảnh mới
+    
+        if (req.file) {
+            // Nếu có ảnh mới, cập nhật ảnh mới
+            image_product = `/img/${req.file.filename}`;
+        }
+    
         try {
             await Product.update(
                 { name_product, price, image_product, quantity, dimension, manufacturer, page, author, publisher, publisher_year, text_product, id_category },
