@@ -7,4 +7,5 @@ router.get('/', cartController.viewCart);
 router.post('/update', cartController.updateCart);
 router.post('/remove', cartController.removeFromCart);
 router.post('/place-order', cartController.placeOrder);
+
 module.exports = router;

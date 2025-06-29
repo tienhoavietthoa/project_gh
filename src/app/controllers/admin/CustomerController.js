@@ -1,12 +1,19 @@
 const { Op } = require('sequelize');
 const Information = require('../../../models/informations');
+
+function wantsJSON(req) {
+    return req.xhr || (req.accepts('json') && !req.accepts('html'));
+}
+
 const customerController = {
     getAllCustomers: async function (req, res) {
         try {
             const customers = await Information.findAll();
+            if (wantsJSON(req)) return res.json({ customers });
             res.render('admin/customer', { customers });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
         }
     },
 
@@ -20,9 +27,11 @@ const customerController = {
 
         try {
             const customers = await Information.findAll({ where: query });
+            if (wantsJSON(req)) return res.json({ customers });
             res.render('admin/customer', { customers });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
         }
     },
 
@@ -31,9 +40,11 @@ const customerController = {
 
         try {
             await Information.destroy({ where: { id_information: id } });
+            if (wantsJSON(req)) return res.json({ success: true, message: "Xóa khách hàng thành công!" });
             res.redirect('/admin/customers');
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
         }
     }
 };
