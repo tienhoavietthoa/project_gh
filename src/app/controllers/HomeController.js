@@ -189,7 +189,67 @@ const homeController = {
             if (wantsJSON(req)) return res.status(500).json({ error: err.message });
             res.status(500).send('Lỗi hệ thống!');
         }
+    },
+
+    changePassword: async function (req, res) {
+        try {
+            let id_login = req.session?.user?.id_login || req.body.id_login;
+            if (!id_login) {
+                if (wantsJSON(req)) return res.status(401).json({ error: "Chưa đăng nhập" });
+                return res.redirect('/auth/login');
+            }
+            const { oldPassword, newPassword } = req.body;
+            const login = await Login.findOne({ where: { id_login } });
+            if (!login) {
+                if (wantsJSON(req)) return res.status(404).json({ error: 'User not found' });
+                return res.status(404).render('404', { message: 'User not found' });
+            }
+            const isMatch = await bcrypt.compare(oldPassword, login.pass);
+            if (!isMatch) {
+                if (wantsJSON(req)) return res.status(400).json({ error: 'Mật khẩu cũ không đúng' });
+                return res.status(400).render('customer/profile', { layout: 'home', user: req.session.user, error: 'Mật khẩu cũ không đúng' });
+            }
+            const hashed = await bcrypt.hash(newPassword, 10);
+            await login.update({ pass: hashed });
+            if (wantsJSON(req)) return res.json({ success: true, message: 'Đổi mật khẩu thành công!' });
+            res.redirect('/profile');
+        } catch (err) {
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
+        }
+    },
+
+    deleteAccount: async function (req, res) {
+    try {
+        let id_login = req.session?.user?.id_login || req.body.id_login;
+        if (!id_login) {
+            if (wantsJSON(req)) return res.status(401).json({ error: "Chưa đăng nhập" });
+            return res.redirect('/auth/login');
+        }
+        const login = await Login.findOne({ where: { id_login } });
+        if (!login) {
+            if (wantsJSON(req)) return res.status(404).json({ error: 'User not found' });
+            return res.status(404).render('404', { message: 'User not found' });
+        }
+        await Information.destroy({ where: { id_information: login.id_information } });
+        await login.destroy();
+        if (wantsJSON(req)) {
+            // API: trả về JSON luôn, không render/redirect
+            return res.json({ success: true, message: 'Xóa tài khoản thành công!' });
+        }
+        // Web: xóa session và redirect
+        if (req.session) {
+            req.session.destroy(() => {
+                res.redirect('/auth/login');
+            });
+        } else {
+            res.redirect('/auth/login');
+        }
+    } catch (err) {
+        if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+        res.status(500).send('Lỗi hệ thống!');
     }
+}
 };
 
 module.exports = homeController;
