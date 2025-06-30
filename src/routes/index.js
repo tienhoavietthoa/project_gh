@@ -25,8 +25,10 @@ router.use('/cart', ensureCustomer, cartRoutes);
 router.use('/order', ensureCustomer, orderRoutes); // Thêm dòng này
 
 // Add middleware to protect specific routes
-router.get('/profile', ensureCustomer, homeController.profile);
-router.post('/profile/edit', ensureCustomer, homeController.updateProfile);
+router.get('/api/profile', homeController.profile);
+router.post('/api/profile/edit', homeController.updateProfile);
+router.post('/api/profile/change-password', homeController.changePassword);
+router.post('/api/profile/delete', homeController.deleteAccount);
 router.get('/products/:id', ensureCustomer, homeController.productDetail);
 
 module.exports = router;
