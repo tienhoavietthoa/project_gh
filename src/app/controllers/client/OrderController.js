@@ -2,7 +2,7 @@ const Order = require('../../../models/order');
 const OrderDetail = require('../../../models/order_detail');
 
 function wantsJSON(req) {
-    return req.xhr || (req.accepts('json') && !req.accepts('html')) || req.method === 'POST';
+    return req.xhr || (req.accepts('json') && !req.accepts('html')) || req.originalUrl.startsWith('/api/');
 }
 
 const orderController = {
@@ -34,7 +34,7 @@ const orderController = {
                 id_login
             });
 
-            const orderDetails = req.session.cart.map(item => ({
+            const orderDetails = (req.session.cart || []).map(item => ({
                 id_order: order.id_order,
                 id_product: item.productId,
                 quantity_detail: item.quantity,

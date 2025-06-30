@@ -7,28 +7,33 @@ const dashboardRouter = require('./admin/dashboard');
 const clientAuthRoutes = require('./client/auth');
 const cartRoutes = require('./client/cart');
 const contactRouter = require('./client/contact');
-const orderRoutes = require('./client/order'); // Thêm dòng này
-const adminOrdersRouter = require('./admin/orders'); // Thêm dòng này
+const orderRoutes = require('./client/order');
+const adminOrdersRouter = require('./admin/orders');
 const { ensureCustomer, ensureAdmin } = require('../app/middleware/authMiddleware');
 
-// Home route
+// Home route cho web
 router.get('/', homeController.index);
 router.get('/search', homeController.search);
-router.use('/contact', contactRouter); // Sử dụng route liên hệ
-// Sử dụng các route
-router.use('/admin/products', ensureAdmin, productRouter);
-router.use('/admin/customers', ensureAdmin, customerRouter);
-router.use('/admin/dashboard', ensureAdmin, dashboardRouter);
-router.use('/admin/orders', ensureAdmin, adminOrdersRouter); // Thêm dòng này
-router.use('/auth', clientAuthRoutes);
-router.use('/cart', ensureCustomer, cartRoutes);
-router.use('/order', ensureCustomer, orderRoutes); // Thêm dòng này
+router.get('/products/:id', ensureCustomer, homeController.productDetail);
 
-// Add middleware to protect specific routes
+// API routes cho mobile/app (luôn trả JSON)
+router.get('/api/home', homeController.index); // API lấy danh mục + sản phẩm
+router.get('/api/search', homeController.search);
+router.get('/api/products/:id', homeController.productDetail);
+
 router.get('/api/profile', homeController.profile);
 router.post('/api/profile/edit', homeController.updateProfile);
 router.post('/api/profile/change-password', homeController.changePassword);
 router.post('/api/profile/delete', homeController.deleteAccount);
-router.get('/products/:id', ensureCustomer, homeController.productDetail);
+
+// Các route khác
+router.use('/contact', contactRouter);
+router.use('/admin/products', ensureAdmin, productRouter);
+router.use('/admin/customers', ensureAdmin, customerRouter);
+router.use('/admin/dashboard', ensureAdmin, dashboardRouter);
+router.use('/admin/orders', ensureAdmin, adminOrdersRouter);
+router.use('/auth', clientAuthRoutes);
+router.use('/cart', ensureCustomer, cartRoutes);
+router.use('/order', ensureCustomer, orderRoutes);
 
 module.exports = router;

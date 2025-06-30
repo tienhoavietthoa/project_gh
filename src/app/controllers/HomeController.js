@@ -10,11 +10,15 @@ Category.hasMany(Product, { foreignKey: 'id_category' });
 Product.belongsTo(Category, { foreignKey: 'id_category' });
 Login.belongsTo(Information, { foreignKey: 'id_information' });
 
+// Hàm kiểm tra request có phải API không (ưu tiên cho mobile app)
 function wantsJSON(req) {
+    // Nếu có header Accept chứa application/json hoặc là request kiểu application/json
+    // hoặc query có ?json=1 hoặc user-agent là okhttp (Android Retrofit)
     return req.xhr ||
         (req.get('accept') && req.get('accept').includes('application/json')) ||
         req.is('application/json') ||
-        req.query.json === '1';
+        req.query.json === '1' ||
+        (req.get('user-agent') && req.get('user-agent').toLowerCase().includes('okhttp'));
 }
 
 const homeController = {
@@ -121,6 +125,66 @@ const homeController = {
             await info.update({ name_information, phone_information, email, date_of_birth });
             if (wantsJSON(req)) return res.json({ success: true, message: 'Cập nhật thông tin thành công!' });
             res.redirect('/profile');
+        } catch (err) {
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
+        }
+    },
+
+    changePassword: async function (req, res) {
+        try {
+            let id_login = req.session?.user?.id_login || req.body.id_login;
+            if (!id_login) {
+                if (wantsJSON(req)) return res.status(401).json({ error: "Chưa đăng nhập" });
+                return res.redirect('/auth/login');
+            }
+            const { oldPassword, newPassword } = req.body;
+            const login = await Login.findOne({ where: { id_login } });
+            if (!login) {
+                if (wantsJSON(req)) return res.status(404).json({ error: 'User not found' });
+                return res.status(404).render('404', { message: 'User not found' });
+            }
+            const isMatch = await bcrypt.compare(oldPassword, login.pass);
+            if (!isMatch) {
+                if (wantsJSON(req)) return res.status(400).json({ error: 'Mật khẩu cũ không đúng' });
+                return res.status(400).render('customer/profile', { layout: 'home', user: req.session.user, error: 'Mật khẩu cũ không đúng' });
+            }
+            const hashed = await bcrypt.hash(newPassword, 10);
+            await login.update({ pass: hashed });
+            if (wantsJSON(req)) return res.json({ success: true, message: 'Đổi mật khẩu thành công!' });
+            res.redirect('/profile');
+        } catch (err) {
+            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+            res.status(500).send('Lỗi hệ thống!');
+        }
+    },
+
+    deleteAccount: async function (req, res) {
+        try {
+            let id_login = req.session?.user?.id_login || req.body.id_login;
+            if (!id_login) {
+                if (wantsJSON(req)) return res.status(401).json({ error: "Chưa đăng nhập" });
+                return res.redirect('/auth/login');
+            }
+            const login = await Login.findOne({ where: { id_login } });
+            if (!login) {
+                if (wantsJSON(req)) return res.status(404).json({ error: 'User not found' });
+                return res.status(404).render('404', { message: 'User not found' });
+            }
+            await Information.destroy({ where: { id_information: login.id_information } });
+            await login.destroy();
+            if (wantsJSON(req)) {
+                // API: trả về JSON luôn, không render/redirect
+                return res.json({ success: true, message: 'Xóa tài khoản thành công!' });
+            }
+            // Web: xóa session và redirect
+            if (req.session) {
+                req.session.destroy(() => {
+                    res.redirect('/auth/login');
+                });
+            } else {
+                res.redirect('/auth/login');
+            }
         } catch (err) {
             if (wantsJSON(req)) return res.status(500).json({ error: err.message });
             res.status(500).send('Lỗi hệ thống!');

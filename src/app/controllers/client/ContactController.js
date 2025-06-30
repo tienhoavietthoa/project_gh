@@ -1,7 +1,7 @@
 const Contact = require('../../../models/contact');
 
 function wantsJSON(req) {
-    return req.xhr || (req.accepts('json') && !req.accepts('html')) || req.method === 'POST';
+    return req.xhr || (req.accepts('json') && !req.accepts('html')) || req.originalUrl.startsWith('/api/');
 }
 
 const contactController = {
