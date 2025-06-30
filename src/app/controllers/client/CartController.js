@@ -109,19 +109,22 @@ const cartController = {
         const productId = parseInt(req.body.productId);
         const userId = req.session.user?.id_login;
         if (!userId) {
-            if (wantsJSON(req)) return res.status(401).json({ success: false });
+            if (wantsJSON(req)) return res.status(401).json({ success: false, error: 'Bạn cần đăng nhập!' });
             return res.redirect('/auth/login');
         }
         try {
             let cart = await Cart.findOne({ where: { id_login: userId } });
-            if (!cart) throw new Error('Không tìm thấy giỏ hàng');
+            if (!cart) {
+                if (wantsJSON(req)) return res.status(404).json({ success: false, error: 'Không tìm thấy giỏ hàng' });
+                return res.status(404).render('404', { message: 'Không tìm thấy giỏ hàng' });
+            }
             await CartDetail.destroy({
                 where: { id_cart: cart.id_cart, id_product: productId }
             });
-            if (wantsJSON(req)) return res.json({ success: true });
+            if (wantsJSON(req)) return res.json({ success: true, message: 'Đã xóa sản phẩm khỏi giỏ hàng!' });
             res.redirect('/cart');
         } catch (error) {
-            if (wantsJSON(req)) return res.status(500).json({ success: false });
+            if (wantsJSON(req)) return res.status(500).json({ success: false, error: 'Lỗi hệ thống!' });
             res.status(500).send('Lỗi hệ thống!');
         }
     },
