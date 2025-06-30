@@ -3,6 +3,8 @@ const CartDetail = require('../../../models/cart_detail');
 const Product = require('../../../models/product');
 
 function wantsJSON(req) {
+    // Nếu là API (bắt đầu bằng /api/), luôn trả JSON
+    if (req.originalUrl.startsWith('/api/')) return true;
     return req.xhr || (req.accepts('json') && !req.accepts('html')) || req.method === 'POST';
 }
 
@@ -44,37 +46,37 @@ const cartController = {
     },
 
     viewCart: async function (req, res) {
-        const userId = req.session.user?.id_login;
-        if (!userId) {
-            if (wantsJSON(req)) return res.status(401).json({ cart: [], total: 0 });
-            return res.redirect('/auth/login');
+    // Ưu tiên session, nếu không có thì lấy từ query hoặc body
+    const userId = req.session.user?.id_login || req.query.id_login || req.body.id_login;
+    if (!userId) {
+        if (wantsJSON(req)) return res.status(401).json({ cart: [], total: 0, error: 'Bạn cần đăng nhập!' });
+        return res.redirect('/auth/login');
+    }
+    try {
+        let cart = await Cart.findOne({ where: { id_login: userId } });
+        let cartDetails = [];
+        let total = 0;
+        if (cart) {
+            cartDetails = await CartDetail.findAll({
+                where: { id_cart: cart.id_cart },
+                include: [{ model: Product, as: 'product' }]
+            });
+            total = cartDetails.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantitycart_detail, 0);
         }
-        try {
-            let cart = await Cart.findOne({ where: { id_login: userId } });
-            let cartDetails = [];
-            let total = 0;
-            if (cart) {
-                cartDetails = await CartDetail.findAll({
-                    where: { id_cart: cart.id_cart },
-                    include: [{ model: Product, as: 'product' }]
-                });
-                total = cartDetails.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantitycart_detail, 0);
-            }
-            const cartItems = cartDetails.map(item => ({
-                productId: item.id_product,
-                name: item.product?.name_product,
-                price: item.product?.price,
-                image: item.product?.image_product,
-                quantity: item.quantitycart_detail
-            }));
-            if (wantsJSON(req)) return res.json({ cart: cartItems, total });
-            res.render('customer/cart', { layout: 'home', cart: cartItems, total });
-        } catch (error) {
-            if (wantsJSON(req)) return res.status(500).json({ cart: [], total: 0 });
-            res.status(500).send('Lỗi hệ thống!');
-        }
-    },
-
+        const cartItems = cartDetails.map(item => ({
+            productId: item.id_product,
+            name: item.product?.name_product,
+            price: item.product?.price,
+            image: item.product?.image_product,
+            quantity: item.quantitycart_detail
+        }));
+        if (wantsJSON(req)) return res.json({ cart: cartItems, total });
+        res.render('customer/cart', { layout: 'home', cart: cartItems, total });
+    } catch (error) {
+        if (wantsJSON(req)) return res.status(500).json({ cart: [], total: 0 });
+        res.status(500).send('Lỗi hệ thống!');
+    }
+},
     updateCart: async function (req, res) {
         const productId = parseInt(req.body.productId);
         const quantity = parseInt(req.body.quantity) || 0;

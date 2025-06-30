@@ -20,9 +20,10 @@ router.get('/products/:id', ensureCustomer, homeController.productDetail);
 router.get('/api/home', homeController.index); // API lấy danh mục + sản phẩm
 router.get('/api/search', homeController.search);
 router.get('/api/products/:id', homeController.productDetail);
-
+router.use('/api/cart', cartRoutes);
 router.get('/api/profile', homeController.profile);
 router.post('/api/profile/edit', homeController.updateProfile);
+
 router.post('/api/profile/change-password', homeController.changePassword);
 router.post('/api/profile/delete', homeController.deleteAccount);
 
@@ -35,5 +36,6 @@ router.use('/admin/orders', ensureAdmin, adminOrdersRouter);
 router.use('/auth', clientAuthRoutes);
 router.use('/cart', ensureCustomer, cartRoutes);
 router.use('/order', ensureCustomer, orderRoutes);
+
 
 module.exports = router;
