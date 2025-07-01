@@ -35,7 +35,7 @@ router.use('/admin/dashboard', ensureAdmin, dashboardRouter);
 router.use('/admin/orders', ensureAdmin, adminOrdersRouter);
 router.use('/auth', clientAuthRoutes);
 router.use('/cart', ensureCustomer, cartRoutes);
-router.use('/order', ensureCustomer, orderRoutes);
+router.use('/order', orderRoutes);
 
 
 module.exports = router;
