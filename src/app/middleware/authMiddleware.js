@@ -28,6 +28,12 @@ function ensureCustomer(req, res, next) {
     if (wantsJSON(req)) return res.status(401).json({ error: "Chưa đăng nhập" });
     res.redirect('/auth/login');
 }
+function ensureCustomer(req, res, next) {
+    if (!req.session.user) {
+        return res.redirect('/auth/login');
+    }
+    next();
+}
 
 module.exports = {
     ensureAuthenticated,
