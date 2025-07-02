@@ -37,26 +37,36 @@ const homeController = {
         }
     },
     search: async function (req, res) {
-        try {
-            const searchTerm = req.query.q;
-            if (!searchTerm) {
-                if (wantsJSON(req)) return res.json({ products: [] });
-                return res.render('home', { layout: 'home', categories: [] });
-            }
-            const products = await Product.findAll({
-                where: {
-                    name_product: {
-                        [Op.like]: `%${searchTerm}%`
-                    }
-                }
-            });
-            if (wantsJSON(req)) return res.json({ products });
-            res.render('customer/searchResults', { layout: 'home', products });
-        } catch (err) {
-            if (wantsJSON(req)) return res.status(500).json({ error: err.message });
-            res.status(500).send('Lỗi hệ thống!');
+    try {
+        const searchTerm = req.query.q;
+        if (!searchTerm) {
+            if (wantsJSON(req)) return res.json({ products: [] });
+            return res.render('home', { layout: 'home', categories: [] });
         }
-    },
+        const products = await Product.findAll({
+            where: {
+                name_product: {
+                    [Op.like]: `%${searchTerm}%`
+                }
+            }
+        });
+        if (wantsJSON(req)) {
+            // Nếu không có sản phẩm, trả về products: [] và message
+            if (!products || products.length === 0) {
+                return res.json({ products: [], message: `Không có dữ liệu cho từ khóa "${searchTerm}"` });
+            }
+            return res.json({ products });
+        }
+        // Web: render kèm thông báo nếu không có sản phẩm
+        if (!products || products.length === 0) {
+            return res.render('customer/searchResults', { layout: 'home', products: [], message: `Không có dữ liệu cho từ khóa "${searchTerm}"` });
+        }
+        res.render('customer/searchResults', { layout: 'home', products });
+    } catch (err) {
+        if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+        res.status(500).send('Lỗi hệ thống!');
+    }
+},
     productDetail: async function (req, res) {
         try {
             const product = await Product.findByPk(req.params.id);
