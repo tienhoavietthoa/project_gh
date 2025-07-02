@@ -15,6 +15,8 @@ const { ensureCustomer, ensureAdmin } = require('../app/middleware/authMiddlewar
 router.get('/', homeController.index);
 router.get('/search', homeController.search);
 router.get('/products/:id', ensureCustomer, homeController.productDetail);
+router.get('/categories', homeController.categoryList); // Trang danh sách loại sản phẩm
+router.get('/categories/:id', homeController.productsByCategory); // Trang sản phẩm theo loại
 
 // API routes cho mobile/app (luôn trả JSON)
 router.get('/api/home', homeController.index); // API lấy danh mục + sản phẩm
@@ -23,7 +25,8 @@ router.get('/api/products/:id', homeController.productDetail);
 router.use('/api/cart', cartRoutes);
 router.get('/api/profile', homeController.profile);
 router.post('/api/profile/edit', homeController.updateProfile);
-
+router.get('/api/categories', homeController.categoryList);
+router.get('/api/categories/:id/products', homeController.productsByCategory);
 router.post('/api/profile/change-password', homeController.changePassword);
 router.post('/api/profile/delete', homeController.deleteAccount);
 

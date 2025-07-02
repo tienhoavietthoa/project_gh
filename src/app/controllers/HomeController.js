@@ -64,7 +64,8 @@ const homeController = {
                 if (wantsJSON(req)) return res.status(404).json({ error: 'Product not found' });
                 return res.status(404).render('404', { message: 'Product not found' });
             }
-            if (wantsJSON(req)) return res.json({ product });
+            // Sửa dòng này:
+            if (wantsJSON(req)) return res.json({ products: [product] });
             res.render('customer/productDetail', { layout: 'home', product });
         } catch (err) {
             if (wantsJSON(req)) return res.status(500).json({ error: err.message });
@@ -249,7 +250,35 @@ const homeController = {
         if (wantsJSON(req)) return res.status(500).json({ error: err.message });
         res.status(500).send('Lỗi hệ thống!');
     }
-}
+},
+    categoryList: async function (req, res) {
+    try {
+        const categories = await Category.findAll();
+        if (wantsJSON(req)) return res.json({ categories });
+        res.render('customer/categoryList', { layout: 'home', categories });
+    } catch (err) {
+        if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+        res.status(500).send('Lỗi hệ thống!');
+    }
+},
+
+productsByCategory: async function (req, res) {
+    try {
+        const id_category = req.params.id;
+        const category = await Category.findByPk(id_category, {
+            include: [{ model: Product }]
+        });
+        if (!category) {
+            if (wantsJSON(req)) return res.status(404).json({ error: 'Category not found' });
+            return res.status(404).render('404', { message: 'Category not found' });
+        }
+        if (wantsJSON(req)) return res.json({ products: category.products, category });
+        res.render('customer/productsByCategory', { layout: 'home', category, products: category.products });
+    } catch (err) {
+        if (wantsJSON(req)) return res.status(500).json({ error: err.message });
+        res.status(500).send('Lỗi hệ thống!');
+    }
+},
 };
 
 module.exports = homeController;
