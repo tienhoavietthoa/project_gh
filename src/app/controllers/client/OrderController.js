@@ -145,28 +145,30 @@ const orderController = {
         }
         const details = await OrderDetail.findAll({
             where: { id_order },
-            include: [{ model: Product, as: 'product' }]
+            include: [{ model: Product, as: 'Product' }] // Đúng alias (chữ P hoa)
         });
         if (wantsJSON(req)) {
-            return res.json({
-                order: {
-                    id_order: order.id_order,
-                    name_order: order.name_order,
-                    phone_order: order.phone_order,
-                    address_order: order.address_order,
-                    payment: order.payment,
-                    total: order.total,
-                    date_order: order.date_order
-                },
-                products: details.map(d => ({
-                    id_product: d.id_product,
-                    name_product: d.product?.name_product || '',
-                    quantity: d.quantity_detail,
-                    price: d.price_detail
-                }))
-            });
-        }
-        res.render('order_detail', { order, details });
+    return res.json({
+        order: {
+            id_order: order.id_order,
+            name_order: order.name_order,
+            phone_order: order.phone_order,
+            address_order: order.address_order,
+            payment: order.payment,
+            total: order.total,
+            date_order: order.date_order
+            },
+            products: details.map(d => ({
+                id_product: d.id_product,
+                name_product: d.Product?.name_product || '', // Đúng chữ P hoa
+                image_product: d.Product?.image_product || '',
+                text_product: d.Product?.text_product || '',
+                quantity: d.quantity_detail,
+                price: d.price_detail
+            }))
+        });
+    }
+            res.render('order_detail', { order, details });
     },
 };
 
