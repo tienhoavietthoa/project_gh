@@ -35,6 +35,9 @@ app.use(session({
     cookie: { secure: false }
 }));
 app.use(methodOverride('_method'));
+// Thêm ở đây
+const fakePayment = require('./routes/fakePayment');
+app.use(fakePayment);
 
 // Routes
 const indexRouter = require('./routes/index');

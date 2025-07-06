@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Giả lập thanh toán VNPAY</title>
+    <style>
+        body { font-family: Arial; background: #f5f8ff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;}
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 8px #0001; padding: 32px 24px; min-width: 320px;}
+        input { font-size: 18px; padding: 8px 12px; border-radius: 8px; border: 1px solid #90caf9; margin-bottom: 16px; width: 100%;}
+        button { background: #1976d2; color: #fff; border: none; border-radius: 8px; padding: 12px 0; width: 100%; font-size: 18px;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Nhập mã OTP để xác nhận thanh toán</h2>
+        <input id="otp" type="text" maxlength="6" placeholder="Nhập OTP (123456)">
+        <button onclick="pay()">Thanh toán</button>
+        <div id="msg" style="color:red;margin-top:10px"></div>
+    </div>
+    <script>
+        function pay() {
+            const otp = document.getElementById('otp').value;
+            if (otp === '123456') {
+                fetch('/api/fake-payment-callback', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        status: 'success',
+                        name: getParam('name'),
+                        phone: getParam('phone'),
+                        address: getParam('address'),
+                        total: getParam('total'),
+                        idLogin: getParam('idLogin'),
+                        productsJson: getParam('productsJson')
+                    })
+                }).then(() => {
+                    alert('Thanh toán thành công!');
+                    window.close();
+                });
+            } else {
+                document.getElementById('msg').innerText = 'OTP không đúng!';
+            }
+        }
+        function getParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+    </script>
+</body>
+</html>
