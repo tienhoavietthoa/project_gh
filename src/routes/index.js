@@ -10,6 +10,8 @@ const cartRoutes = require('./client/cart');
 const contactRouter = require('./client/contact');
 const orderRoutes = require('./client/order');
 const adminOrdersRouter = require('./admin/orders');
+const authController = require('../app/controllers/client/AuthController');
+
 const { ensureCustomer, ensureAdmin } = require('../app/middleware/authMiddleware');
 
 // Home route cho web
@@ -30,7 +32,8 @@ router.get('/api/categories', homeController.categoryList);
 router.get('/api/categories/:id/products', homeController.productsByCategory);
 router.post('/api/profile/change-password', homeController.changePassword);
 router.post('/api/profile/delete', homeController.deleteAccount);
-
+// Route cho reset password
+router.post('/api/auth/reset-password', authController.resetPassword);
 // Các route khác
 router.use('/contact', contactRouter);
 router.use('/admin/products', ensureAdmin, productRouter);
