@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const homeController = require('../app/controllers/HomeController');
 const productRouter = require('./admin/product');
 const customerRouter = require('./admin/customer');
@@ -39,6 +40,11 @@ router.use('/admin/orders', ensureAdmin, adminOrdersRouter);
 router.use('/auth', clientAuthRoutes);
 router.use('/cart', ensureCustomer, cartRoutes);
 router.use('/order', orderRoutes);
+
+// Test routes
+router.get('/vnpay-test', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../public/vnpay-test.html'));
+});
 
 
 module.exports = router;

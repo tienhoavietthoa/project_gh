@@ -1,6 +1,8 @@
 const Order = require('../../../models/order');
 const OrderDetail = require('../../../models/order_detail');
 const Product = require('../../../models/product');
+const VNPayHelper = require('../../../helpers/vnpayHelper');
+const querystring = require('querystring');
 
 function wantsJSON(req) {
     return req.xhr
@@ -54,7 +56,9 @@ const orderController = {
         }
 
         try {
-            // Tạo đơn hàng
+            // Tạo đơn hàng với trạng thái pending nếu thanh toán VNPay
+            const paymentStatus = payment.toLowerCase() === 'vnpay' ? 'pending' : 'paid';
+            
             const order = await Order.create({
                 name_order,
                 phone_order,
@@ -62,7 +66,8 @@ const orderController = {
                 payment,
                 total,
                 date_order,
-                id_login
+                id_login,
+                payment_status: paymentStatus
             });
 
             // Lưu chi tiết đơn hàng
@@ -91,11 +96,35 @@ const orderController = {
             // Xóa giỏ hàng sau khi đặt hàng
             if (req.session.cart) delete req.session.cart;
 
+            // Nếu thanh toán VNPay, tạo URL thanh toán
+            if (payment.toLowerCase() === 'vnpay') {
+                const ipAddr = VNPayHelper.getClientIpAddress(req);
+                const orderInfo = `Thanh toan don hang ${order.id_order}`;
+                const vnpayUrl = VNPayHelper.createPaymentUrl(
+                    order.id_order,
+                    total,
+                    orderInfo,
+                    ipAddr
+                );
+
+                if (wantsJSON(req)) {
+                    return res.json({
+                        success: true,
+                        message: 'Đơn hàng đã được tạo, vui lòng thanh toán',
+                        orderId: order.id_order,
+                        vnpayUrl: vnpayUrl,
+                        paymentStatus: 'pending'
+                    });
+                }
+                return res.redirect(vnpayUrl);
+            }
+
             if (wantsJSON(req)) {
                 return res.json({
                     success: true,
                     message: 'Đơn hàng của bạn đã được đặt thành công!',
-                    orderId: order.id_order
+                    orderId: order.id_order,
+                    paymentStatus: 'paid'
                 });
             }
             req.session.successMessage = 'Đơn hàng của bạn đã được đặt thành công!';
@@ -169,6 +198,153 @@ const orderController = {
         });
     }
             res.render('order_detail', { order, details });
+    },
+
+    // API: Kiểm tra trạng thái thanh toán đơn hàng (cho app Android)
+    checkPaymentStatus: async (req, res) => {
+        const orderId = req.params.id || req.query.orderId;
+        
+        if (!orderId) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Thiếu orderId' 
+            });
+        }
+
+        try {
+            const order = await Order.findOne({ 
+                where: { id_order: orderId } 
+            });
+
+            if (!order) {
+                return res.status(404).json({ 
+                    success: false, 
+                    error: 'Không tìm thấy đơn hàng' 
+                });
+            }
+
+            return res.json({
+                success: true,
+                orderId: order.id_order,
+                paymentStatus: order.payment_status,
+                isPaid: order.payment_status === 'paid'
+            });
+        } catch (error) {
+            return res.status(500).json({ 
+                success: false, 
+                error: error.message 
+            });
+        }
+    },
+
+    // VNPay callback xử lý kết quả thanh toán
+    vnpayReturn: async (req, res) => {
+        const vnp_Params = req.query;
+        const isValid = VNPayHelper.verifyReturnUrl(vnp_Params);
+
+        if (isValid) {
+            const orderId = vnp_Params['vnp_TxnRef'];
+            const responseCode = vnp_Params['vnp_ResponseCode'];
+
+            if (responseCode === '00') {
+                // Thanh toán thành công
+                await Order.update(
+                    { payment_status: 'paid' },
+                    { where: { id_order: orderId } }
+                );
+
+                if (wantsJSON(req)) {
+                    return res.json({
+                        success: true,
+                        message: 'Thanh toán thành công',
+                        orderId: orderId
+                    });
+                }
+                // Redirect đến trang kết quả với các tham số
+                return res.redirect(`/order/vnpay/result?${querystring.stringify(vnp_Params)}`);
+            } else {
+                // Thanh toán thất bại
+                await Order.update(
+                    { payment_status: 'failed' },
+                    { where: { id_order: orderId } }
+                );
+
+                if (wantsJSON(req)) {
+                    return res.json({
+                        success: false,
+                        message: 'Thanh toán thất bại',
+                        orderId: orderId
+                    });
+                }
+                // Redirect đến trang kết quả với các tham số
+                return res.redirect(`/order/vnpay/result?${querystring.stringify(vnp_Params)}`);
+            }
+        } else {
+            if (wantsJSON(req)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Chữ ký không hợp lệ'
+                });
+            }
+            return res.redirect('/order/failed');
+        }
+    },
+
+    // VNPay IPN (Instant Payment Notification)
+    vnpayIPN: async (req, res) => {
+        const vnp_Params = req.query;
+        const isValid = VNPayHelper.verifyReturnUrl(vnp_Params);
+
+        if (isValid) {
+            const orderId = vnp_Params['vnp_TxnRef'];
+            const responseCode = vnp_Params['vnp_ResponseCode'];
+
+            if (responseCode === '00') {
+                // Cập nhật trạng thái đơn hàng
+                await Order.update(
+                    { payment_status: 'paid' },
+                    { where: { id_order: orderId } }
+                );
+            }
+
+            return res.status(200).json({ RspCode: '00', Message: 'success' });
+        } else {
+            return res.status(200).json({ RspCode: '97', Message: 'Fail checksum' });
+        }
+    },
+
+    // Fake payment để test
+    fakePayment: async (req, res) => {
+        const { orderId, status } = req.body;
+        
+        try {
+            if (!orderId || !status) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing orderId or status'
+                });
+            }
+            
+            const paymentStatus = status === 'success' ? 'paid' : 'failed';
+            
+            // Cập nhật trạng thái đơn hàng
+            await Order.update(
+                { payment_status: paymentStatus },
+                { where: { id_order: orderId } }
+            );
+            
+            return res.json({
+                success: true,
+                message: `Payment ${status} (fake)`,
+                orderId: orderId
+            });
+        } catch (error) {
+            console.error('Fake payment error:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
     },
 };
 

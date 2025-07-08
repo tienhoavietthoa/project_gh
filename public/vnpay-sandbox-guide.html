@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VNPay Sandbox Testing Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .code { background-color: #f8f9fa; padding: 10px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VNPay Sandbox Testing Guide</h1>
+        
+        <div class="step success">
+            <h2>Option 1: Fake Payment (Recommended for Development)</h2>
+            <p>Sử dụng fake payment để test logic app mà không phụ thuộc vào VNPay:</p>
+            <ul>
+                <li>Mở <strong>http://localhost:3000/vnpay-test</strong></li>
+                <li>Nhập Order ID từ app</li>
+                <li>Click "Test Success" hoặc "Test Failed"</li>
+                <li>App sẽ nhận kết quả ngay lập tức</li>
+            </ul>
+        </div>
+        
+        <div class="step warning">
+            <h2>Option 2: VNPay Sandbox (Có thể không ổn định)</h2>
+            <p>Nếu muốn test VNPay thật, làm theo các bước:</p>
+            
+            <h3>1. Thông tin thẻ test:</h3>
+            <div class="code">
+                Số thẻ: 9704198526191432198<br>
+                Tên: NGUYEN VAN A<br>
+                Ngày phát hành: 07/15<br>
+                Mật khẩu: 123456<br>
+                OTP: 123456
+            </div>
+            
+            <h3>2. Cách test:</h3>
+            <ol>
+                <li>Tạo đơn hàng từ Android app</li>
+                <li>WebView sẽ mở VNPay</li>
+                <li>Nếu hiển thị form thanh toán → nhập thông tin thẻ test</li>
+                <li>Nếu hiển thị lỗi → dùng fake payment</li>
+                <li>Sau khi thanh toán → app sẽ nhận callback</li>
+            </ol>
+        </div>
+        
+        <div class="step error">
+            <h2>Option 3: Callback URL Issue</h2>
+            <p>VNPay sandbox yêu cầu callback URL public. Hiện tại đang dùng localhost:</p>
+            <div class="code">
+                vnp_ReturnUrl: http://localhost:3000/order/vnpay/return<br>
+                vnp_IpnUrl: http://localhost:3000/order/vnpay/ipn
+            </div>
+            
+            <p>Để test VNPay thật, cần:</p>
+            <ul>
+                <li>Sử dụng ngrok để tạo public URL</li>
+                <li>Cập nhật callback URL trong config</li>
+                <li>Hoặc deploy lên server public</li>
+            </ul>
+        </div>
+        
+        <div class="step success">
+            <h2>Kết luận</h2>
+            <p><strong>Cho mục đích học tập:</strong> Sử dụng fake payment là tốt nhất</p>
+            <p><strong>Cho production:</strong> Cần đăng ký tài khoản VNPay thật và setup callback URL</p>
+            <p><strong>Hiện tại:</strong> Logic app đã hoàn thiện, chỉ cần test interface</p>
+        </div>
+    </div>
+</body>
+</html>

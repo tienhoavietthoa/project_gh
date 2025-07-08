@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VNPay Payment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 5px;
+            background: #d4edda;
+            margin: 20px 0;
+        }
+        .error {
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8d7da;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VNPay Payment Result</h1>
+        
+        <div id="result">
+            <p>Processing payment result...</p>
+        </div>
+        
+        <div id="orderInfo" style="display: none;">
+            <h3>Order Information:</h3>
+            <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+            <p><strong>Amount:</strong> <span id="amount"></span> VND</p>
+            <p><strong>Status:</strong> <span id="status"></span></p>
+            <p><strong>Transaction ID:</strong> <span id="transactionId"></span></p>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="#" class="btn" onclick="window.close()">Close</a>
+            <a href="#" class="btn" onclick="continueApp()">Continue</a>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tham số URL
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return Object.fromEntries(params);
+        }
+
+        // Xử lý kết quả thanh toán
+        function processPaymentResult() {
+            const params = getUrlParams();
+            const resultDiv = document.getElementById('result');
+            const orderInfoDiv = document.getElementById('orderInfo');
+            
+            // Kiểm tra nếu là mock payment
+            if (params.isMockPayment === 'true') {
+                // Xử lý mock payment
+                if (params.responseCode === '00') {
+                    resultDiv.innerHTML = '<div class="success">Payment successful! (Mock)</div>';
+                    document.getElementById('orderId').textContent = params.orderId;
+                    document.getElementById('amount').textContent = parseInt(params.amount).toLocaleString();
+                    document.getElementById('status').textContent = 'Successful';
+                    document.getElementById('transactionId').textContent = 'MOCK_' + params.orderId;
+                    orderInfoDiv.style.display = 'block';
+                    
+                    // Thông báo cho app Android
+                    if (window.Android) {
+                        window.Android.onPaymentSuccess(params.orderId);
+                    }
+                } else {
+                    resultDiv.innerHTML = '<div class="error">Payment failed! (Mock)</div>';
+                    
+                    // Thông báo cho app Android
+                    if (window.Android) {
+                        window.Android.onPaymentFailed(params.responseCode);
+                    }
+                }
+            } else {
+                // Xử lý VNPay thật
+                if (params.vnp_ResponseCode === '00') {
+                    resultDiv.innerHTML = '<div class="success">Payment successful!</div>';
+                    document.getElementById('orderId').textContent = params.vnp_TxnRef;
+                    document.getElementById('amount').textContent = (parseInt(params.vnp_Amount) / 100).toLocaleString();
+                    document.getElementById('status').textContent = 'Successful';
+                    document.getElementById('transactionId').textContent = params.vnp_TransactionNo;
+                    orderInfoDiv.style.display = 'block';
+                    
+                    // Thông báo cho app Android
+                    if (window.Android) {
+                        window.Android.onPaymentSuccess(params.vnp_TxnRef);
+                    }
+                } else {
+                    resultDiv.innerHTML = '<div class="error">Payment failed!</div>';
+                    
+                    // Thông báo cho app Android
+                    if (window.Android) {
+                        window.Android.onPaymentFailed(params.vnp_ResponseCode);
+                    }
+                }
+            }
+        }
+
+        // Tiếp tục với app
+        function continueApp() {
+            if (window.Android) {
+                window.Android.onPaymentCompleted();
+            } else {
+                window.close();
+            }
+        }
+
+        // Chạy khi trang load
+        window.onload = function() {
+            processPaymentResult();
+        };
+    </script>
+</body>
+</html>

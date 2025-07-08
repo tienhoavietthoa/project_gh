@@ -35,6 +35,11 @@ const Order = sequelize.define('Order', {
     id_login: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    payment_status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'pending' // pending, paid, failed, cancelled
     }
 }, {
     tableName: 'orders',
