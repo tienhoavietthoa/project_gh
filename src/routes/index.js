@@ -9,17 +9,19 @@ const cartRoutes = require('./client/cart');
 const contactRouter = require('./client/contact');
 const orderRoutes = require('./client/order');
 const adminOrdersRouter = require('./admin/orders');
+const authController = require('../app/controllers/client/AuthController');
+
 const { ensureCustomer, ensureAdmin } = require('../app/middleware/authMiddleware');
 
 // Home route cho web
 router.get('/', homeController.index);
 router.get('/search', homeController.search);
 router.get('/products/:id', ensureCustomer, homeController.productDetail);
-router.get('/categories', homeController.categoryList); // Trang danh sách loại sản phẩm
-router.get('/categories/:id', homeController.productsByCategory); // Trang sản phẩm theo loại
+router.get('/categories', homeController.categoryList);
+router.get('/categories/:id', homeController.productsByCategory);
 
-// API routes cho mobile/app (luôn trả JSON)
-router.get('/api/home', homeController.index); // API lấy danh mục + sản phẩm
+// API routes cho mobile/app
+router.get('/api/home', homeController.index);
 router.get('/api/search', homeController.search);
 router.get('/api/products/:id', homeController.productDetail);
 router.use('/api/cart', cartRoutes);
@@ -29,6 +31,7 @@ router.get('/api/categories', homeController.categoryList);
 router.get('/api/categories/:id/products', homeController.productsByCategory);
 router.post('/api/profile/change-password', homeController.changePassword);
 router.post('/api/profile/delete', homeController.deleteAccount);
+router.post('/api/auth/reset-password', authController.resetPassword);
 
 // Các route khác
 router.use('/contact', contactRouter);
@@ -39,6 +42,5 @@ router.use('/admin/orders', ensureAdmin, adminOrdersRouter);
 router.use('/auth', clientAuthRoutes);
 router.use('/cart', ensureCustomer, cartRoutes);
 router.use('/order', orderRoutes);
-
 
 module.exports = router;

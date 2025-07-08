@@ -3,7 +3,6 @@ const Information = require('../../../models/informations');
 const Login = require('../../../models/login');
 
 function wantsJSON(req) {
-    // Ưu tiên Accept: application/json hoặc request từ app (Retrofit)
     return req.xhr || (req.get('accept') && req.get('accept').includes('application/json'));
 }
 
@@ -23,7 +22,6 @@ const authController = {
         try {
             const existingUser = await Information.findOne({ where: { phone_information } });
             if (existingUser) {
-                // Luôn trả về JSON nếu là request từ app (Retrofit hoặc Accept: application/json)
                 if (wantsJSON(req) || req.method === 'POST') {
                     return res.status(400).json({ success: false, error: "Số điện thoại đã được đăng ký" });
                 }
@@ -40,7 +38,6 @@ const authController = {
             });
             await newInformation.update({ id_login: newLogin.id_login });
 
-            // Luôn trả về JSON nếu là request từ app (Retrofit hoặc Accept: application/json)
             if (wantsJSON(req) || req.method === 'POST') {
                 return res.json({
                     success: true,
@@ -53,10 +50,8 @@ const authController = {
                     }
                 });
             }
-            // Trường hợp web
             res.redirect('/auth/login');
         } catch (error) {
-            // Luôn trả về JSON nếu là request từ app (Retrofit hoặc Accept: application/json)
             if (wantsJSON(req) || req.method === 'POST') {
                 return res.status(500).json({ success: false, error: error.message });
             }
@@ -109,7 +104,7 @@ const authController = {
             res.render('auth/login', { error: error.message, layout: 'auth' });
         }
     },
-    
+
     logout(req, res) {
         req.session.destroy(() => {
             if (wantsJSON(req) || req.method === 'POST') {
@@ -117,6 +112,49 @@ const authController = {
             }
             res.redirect('/auth/login');
         });
+    },
+
+    async resetPassword(req, res) {
+        const { phone_information, new_password } = req.body;
+
+        try {
+            if (!phone_information || !new_password) {
+                return res.status(400).json({ success: false, error: "Thiếu thông tin bắt buộc" });
+            }
+
+            if (new_password.length < 6) {
+                return res.status(400).json({ success: false, error: "Mật khẩu phải có ít nhất 6 ký tự" });
+            }
+
+            const userInfo = await Information.findOne({ where: { phone_information } });
+            if (!userInfo) {
+                return res.status(404).json({ success: false, error: "Số điện thoại không tồn tại trong hệ thống" });
+            }
+
+            const user = await Login.findOne({ where: { id_information: userInfo.id_information } });
+            if (!user) {
+                return res.status(404).json({ success: false, error: "Không tìm thấy tài khoản đăng nhập" });
+            }
+
+            const hashedPassword = await bcrypt.hash(new_password, 10);
+            await user.update({ pass: hashedPassword });
+
+            return res.json({
+                success: true,
+                message: "Đặt lại mật khẩu thành công",
+                error: null,
+                user: null
+            });
+
+        } catch (error) {
+            console.error('Reset password error:', error);
+            return res.status(500).json({
+                success: false,
+                error: "Lỗi hệ thống, vui lòng thử lại sau",
+                message: null,
+                user: null
+            });
+        }
     }
 };
 
