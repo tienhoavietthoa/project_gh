@@ -1,0 +1,38 @@
+{{!< home }}
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">Đặt hàng</h2>
+        <form action="/order/create" method="POST">
+            <div class="form-group">
+                <label for="name_order">Tên</label>
+                <input type="text" id="name_order" name="name_order" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_order">Số điện thoại</label>
+                <input type="text" id="phone_order" name="phone_order" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="address_order">Địa chỉ</label>
+                <input type="text" id="address_order" name="address_order" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="payment">Phương thức thanh toán</label>
+                <input type="text" id="payment" name="payment" value="Trả tiền khi nhận hàng" class="form-control" readonly>
+            </div>
+            <h3 class="mt-4">Tóm tắt đơn hàng</h3>
+            <ul class="list-group mb-4">
+                {{#each cart}}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{this.name}}
+                    <span>{{this.quantity}} x {{this.price}} VND</span>
+                </li>
+                {{/each}}
+            </ul>
+            <div class="text-right mb-4">
+                <strong>Tổng cộng: {{reduce cart 'quantity' 'price'}} VND</strong>
+            </div>
+            <button type="submit" class="btn btn-primary">Đặt hàng</button>
+        </form>
+    </div>
+</section>

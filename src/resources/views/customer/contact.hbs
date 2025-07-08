@@ -1,0 +1,32 @@
+{{!-- Sử dụng layout home --}}
+{{!< home }}
+
+<section class="p-10 bg-gray-100">
+    <div class="container mx-auto max-w-lg bg-white shadow-lg rounded-lg p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Liên Hệ Với Chúng Tôi</h2>
+        <form action="/contact/create" method="POST" class="space-y-4">
+            <div>
+                <label for="name_contact" class="block text-gray-700 font-medium mb-2">Tên của bạn</label>
+                <input type="text" id="name_contact" name="name_contact"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 ease-in-out"
+                    placeholder="Nhập tên của bạn" required>
+            </div>
+            <div>
+                <label for="phone_contact" class="block text-gray-700 font-medium mb-2">Số Điện Thoại</label>
+                <input type="text" id="phone_contact" name="phone_contact"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 ease-in-out"
+                    placeholder="Nhập số điện thoại" required>
+            </div>
+            <div>
+                <label for="text_contact" class="block text-gray-700 font-medium mb-2">Tin Nhắn</label>
+                <textarea id="text_contact" name="text_contact" rows="5"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200 ease-in-out"
+                    placeholder="Nhập nội dung tin nhắn của bạn" required></textarea>
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200">
+                Gửi Tin Nhắn
+            </button>
+        </form>
+    </div>
+</section>

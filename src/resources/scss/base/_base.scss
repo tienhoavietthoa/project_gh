@@ -1,0 +1,21 @@
+@use 'variables' as *;
+
+body {
+  background-color: $light-color;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin-bottom: 10px;
+}
+
+main {
+  padding: 20px;
+}
+
+.table img {
+  max-width: 50px;
+}

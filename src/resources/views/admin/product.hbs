@@ -1,0 +1,159 @@
+{{!-- Sử dụng layout 'main' --}}
+<section class="p-6 grid grid-cols-3 gap-6">
+    <div class="container mt-4 col-span-3">
+        <h3 class="text-center mb-4 text-2xl font-semibold">Quản Lý Danh Sách Sản Phẩm</h3>
+
+        <!-- Form tìm kiếm sản phẩm -->
+        <div class="relative flex items-center">
+            <!-- Icon tìm kiếm -->
+            <button id="toggleSearch" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition">
+                <i class="fa fa-search text-gray-600"></i>
+            </button>
+
+            <!-- Ô nhập tìm kiếm (ẩn mặc định) -->
+            <form action="/admin/products" method="GET"
+                id="searchForm"
+                class="absolute top-0 left-10 hidden flex items-center bg-white shadow-lg border border-gray-300 rounded-lg">
+                <input type="text" name="name" placeholder="Search by product name"
+                    class="form-control px-4 py-2 w-60 outline-none border-none">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-r-lg">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Nút tạo sản phẩm mới -->
+        <div class="mb-4">
+            <a href="/admin/products/create" class="btn btn-primary d-flex align-items-center w-fit">
+                <i class="fa fa-plus mr-2"></i> Tạo sản phẩm mới
+            </a>
+        </div>
+
+        <!-- Bảng sản phẩm -->
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="py-3 px-4">STT</th>
+                        <th class="py-3 px-4">Tên</th>
+                        <th class="py-3 px-4">Giá</th>
+                        <th class="py-3 px-4">Ảnh</th>
+                        <th class="py-3 px-4">SL</th>
+                        <th class="py-3 px-4">Kích thước</th>
+                        <th class="py-3 px-4">NSX</th>
+                        <th class="py-3 px-4">Trang</th>
+                        <th class="py-3 px-4">Tác giả</th>
+                        <th class="py-3 px-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                        <tr>
+                            <td class="py-2 px-4">{{sum @index 1}}</td>
+                            <td class="py-2 px-4">{{this.name_product}}</td>
+                            <td class="py-2 px-4">{{this.price}}</td>
+                            <td class="py-2 px-4">
+                                <div class="image-frame">
+                                    {{#if this.image_product}}
+                                        <img src="{{this.image_product}}" alt="{{this.name_product}}" class="rounded border border-secondary p-1" style="width: 80px; height: 100px; object-fit: cover;">
+                                    {{else}}
+                                        <div class="text-muted">Chưa có ảnh</div>
+                                    {{/if}}
+                                </div>
+                            </td>
+                            <td class="py-2 px-4">{{this.quantity}}</td>
+                            <td class="py-2 px-4">{{this.dimension}}</td>
+                            <td class="py-2 px-4">{{this.manufacturer}}</td>
+                            <td class="py-2 px-4">{{this.page}}</td>
+                            <td class="py-2 px-4">{{this.author}}</td>
+                            <td class="py-2 px-4">
+                                <a href="/admin/products/edit/{{this.id_product}}" class="text-primary" title="Sửa">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <form action="/admin/products/{{this.id_product}}?_method=DELETE" method="POST" style="display: inline;">
+                                    <button type="submit" class="text-danger border-0 bg-transparent ml-3" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mt-6">
+            <nav aria-label="Page navigation">
+                <ul class="pagination flex gap-2">
+                    <!-- Nút "Trước" -->
+                    {{#if (gt currentPage 1)}}
+                        <li class="page-item">
+                            <a class="page-link flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-gray-600 hover:bg-blue-500 hover:text-white transition"
+                               href="?page={{sub currentPage 1}}" aria-label="Previous">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {{/if}}
+
+                    <!-- Số trang -->
+                    {{#each (range 1 totalPages)}}
+                        <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+                            <a class="page-link flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-gray-600 hover:bg-blue-500 hover:text-white transition 
+                                      {{#if (eq this ../currentPage)}}bg-blue-500 text-white font-bold shadow-md{{/if}}"
+                               href="?page={{this}}">
+                                {{this}}
+                            </a>
+                        </li>
+                    {{/each}}
+
+                    <!-- Nút "Sau" -->
+                    {{#if (lt currentPage totalPages)}}
+                        <li class="page-item">
+                            <a class="page-link flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-gray-600 hover:bg-blue-500 hover:text-white transition"
+                               href="?page={{add currentPage 1}}" aria-label="Next">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                    {{/if}}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Hiệu ứng chuyển trang mượt mà -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll('.page-link').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.body.style.opacity = '0.5';
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 300);
+                    });
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toggleSearch = document.getElementById("toggleSearch");
+                const searchForm = document.getElementById("searchForm");
+
+                toggleSearch.addEventListener("click", function (event) {
+                    event.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                    searchForm.classList.toggle("hidden");
+                    searchForm.classList.toggle("flex");
+                });
+
+                // Ẩn ô tìm kiếm khi click ra ngoài
+                document.addEventListener("click", function (event) {
+                    if (!searchForm.contains(event.target) && event.target !== toggleSearch) {
+                        searchForm.classList.add("hidden");
+                        searchForm.classList.remove("flex");
+                    }
+                });
+            });
+            </script>
+
+    </div>
+</section>

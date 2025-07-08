@@ -1,0 +1,30 @@
+{{!-- Sử dụng layout main --}}
+{{!< main }}
+
+<section class="p-10 bg-gray-100">
+    <div class="container mx-auto w-full bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Danh Sách Tin Nhắn Liên Hệ</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full bg-white border border-gray-300 rounded-lg shadow-md">
+                <thead class="bg-blue-500 text-white">
+                    <tr>
+                        <th class="py-3 px-4 text-left">Tên</th>
+                        <th class="py-3 px-4 text-left">Số Điện Thoại</th>
+                        <th class="py-3 px-4 text-left">Tin Nhắn</th>
+                        <th class="py-3 px-4 text-left">Ngày</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each contacts}}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100 transition">
+                        <td class="py-3 px-4">{{this.name_contact}}</td>
+                        <td class="py-3 px-4">{{this.phone_contact}}</td>
+                        <td class="py-3 px-4">{{this.text_contact}}</td>
+                        <td class="py-3 px-4">{{this.date_contact}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

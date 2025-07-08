@@ -1,0 +1,72 @@
+<section class="p-6">
+    <div class="container mt-4">
+        <!-- Nút Quay lại -->
+        <a href="javascript:history.back()" class="btn btn-secondary mb-4">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+
+        <h3 class="text-center mb-4 text-2xl font-semibold">Chỉnh sửa sản phẩm</h3>
+        <form action="/admin/products/{{product.id_product}}?_method=PUT" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="existing_image_product" value="{{product.image_product}}">
+            <div class="mb-4">
+                <label for="name_product" class="block text-gray-700">Tên sản phẩm:</label>
+                <input type="text" id="name_product" name="name_product" class="w-full p-2 border rounded" value="{{product.name_product}}">
+            </div>
+            <div class="mb-4">
+                <label for="price" class="block text-gray-700">Giá:</label>
+                <input type="text" id="price" name="price" class="w-full p-2 border rounded" value="{{product.price}}">
+            </div>
+            <div class="mb-4">
+                <label for="image_product" class="block text-gray-700">Ảnh sản phẩm:</label>
+                <input type="file" id="image_product" name="image_product" class="w-full p-2 border rounded">
+                {{#if product.image_product}}
+                    <img src="{{product.image_product}}" alt="{{product.name_product}}" class="mt-2" style="width: 120px; height: 160px; object-fit: cover;">
+                {{/if}}
+            </div>
+            <div class="mb-4">
+                <label for="quantity" class="block text-gray-700">Số lượng:</label>
+                <input type="number" id="quantity" name="quantity" class="w-full p-2 border rounded" value="{{product.quantity}}">
+            </div>
+            <div class="mb-4">
+                <label for="dimension" class="block text-gray-700">Kích thước:</label>
+                <input type="text" id="dimension" name="dimension" class="w-full p-2 border rounded" value="{{product.dimension}}">
+            </div>
+            <div class="mb-4">
+                <label for="manufacturer" class="block text-gray-700">Nhà sản xuất:</label>
+                <input type="text" id="manufacturer" name="manufacturer" class="w-full p-2 border rounded" value="{{product.manufacturer}}">
+            </div>
+            <div class="mb-4">
+                <label for="page" class="block text-gray-700">Số trang:</label>
+                <input type="number" id="page" name="page" class="w-full p-2 border rounded" value="{{product.page}}">
+            </div>
+            <div class="mb-4">
+                <label for="author" class="block text-gray-700">Tác giả:</label>
+                <input type="text" id="author" name="author" class="w-full p-2 border rounded" value="{{product.author}}">
+            </div>
+            <div class="mb-4">
+                <label for="publisher" class="block text-gray-700">Nhà xuất bản:</label>
+                <input type="text" id="publisher" name="publisher" class="w-full p-2 border rounded" value="{{product.publisher}}">
+            </div>
+            <div class="mb-4">
+                <label for="publisher_year" class="block text-gray-700">Năm xuất bản:</label>
+                <input type="number" id="publisher_year" name="publisher_year" class="w-full p-2 border rounded" value="{{product.publisher_year}}">
+            </div>
+            <div class="mb-4">
+                <label for="id_category" class="block text-gray-700">Loại sản phẩm:</label>
+                <select id="id_category" name="id_category" class="w-full p-2 border rounded">
+                    {{#each categories}}
+                        <option value="{{this.id_category}}" {{#ifCond this.id_category '==' ../product.id_category}}selected{{/ifCond}}>{{this.name_category}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="text_product" class="block text-gray-700">Mô tả sản phẩm:</label>
+                <textarea id="text_product" name="text_product" class="w-full p-2 border rounded">{{product.text_product}}</textarea>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</section>
