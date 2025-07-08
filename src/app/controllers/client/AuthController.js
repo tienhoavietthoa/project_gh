@@ -117,7 +117,77 @@ const authController = {
             }
             res.redirect('/auth/login');
         });
+    },
+    // API để reset mật khẩu sau khi xác thực OTP
+    async resetPassword(req, res) {
+    const { phone_information, new_password } = req.body;
+    
+    try {
+        // Validate input
+        if (!phone_information || !new_password) {
+            return res.status(400).json({ 
+                success: false, 
+                error: "Thiếu thông tin bắt buộc" 
+            });
+        }
+
+        if (new_password.length < 6) {
+            return res.status(400).json({ 
+                success: false, 
+                error: "Mật khẩu phải có ít nhất 6 ký tự" 
+            });
+        }
+
+        // Tìm user theo số điện thoại
+        const userInfo = await Information.findOne({ 
+            where: { phone_information } 
+        });
+        
+        if (!userInfo) {
+            return res.status(404).json({ 
+                success: false, 
+                error: "Số điện thoại không tồn tại trong hệ thống" 
+            });
+        }
+
+        // Tìm login record
+        const user = await Login.findOne({ 
+            where: { id_information: userInfo.id_information } 
+        });
+        
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                error: "Không tìm thấy tài khoản đăng nhập" 
+            });
+        }
+
+        // Hash mật khẩu mới
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+        
+        // Cập nhật mật khẩu trong database
+        await user.update({ 
+            pass: hashedPassword
+        });
+
+        // Trả về success (giống format LoginResponse)
+        return res.json({
+            success: true,
+            message: "Đặt lại mật khẩu thành công",
+            error: null,
+            user: null
+        });
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return res.status(500).json({ 
+            success: false, 
+            error: "Lỗi hệ thống, vui lòng thử lại sau",
+            message: null,
+            user: null
+        });
     }
+},
 };
 
 module.exports = authController;
