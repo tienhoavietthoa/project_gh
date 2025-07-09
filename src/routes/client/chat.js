@@ -1,4 +1,4 @@
-const express = require('express');
+const express  = require('express'); 
 const router = express.Router();
 const Product = require('../../models/product');
 const Category = require('../../models/category');
@@ -7,7 +7,7 @@ router.post('/api/chat', async (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).send('Vui lòng nhập câu hỏi.');
 
-    try {
+    try {  
         const products = await Product.findAll();
         const categories = await Category.findAll();
         const lowerMsg = message.toLowerCase();
@@ -53,7 +53,6 @@ router.post('/api/chat', async (req, res) => {
                 response += ` Thể loại: ${category?.name_category || 'Không rõ'}.`;
             }
 
-            // Nếu chỉ hỏi tên sách mà không có từ khoá cụ thể
             if (response === `📘 ${book.name_product}`) {
                 const category = categories.find(c => c.id_category === book.id_category);
                 response = `📘 Thông tin về sách "${book.name_product}":\n- Giá: ${book.price}đ\n- Nhà xuất bản: ${book.publisher}\n- Năm xuất bản: ${book.publisher_year}\n- Thể loại: ${category?.name_category || 'Không rõ'}`;
@@ -62,13 +61,86 @@ router.post('/api/chat', async (req, res) => {
             return res.send(response);
         }
 
-        // 4. Hỏi theo giá tiền
-        const priceMatch = message.match(/(\d{5,7})/g);
-        if (priceMatch) {
-            const matched = products.filter(p => priceMatch.includes(p.price.toString()));
-            if (matched.length > 0) {
-                const list = matched.map(p => `📘 ${p.name_product} có giá ${p.price}đ`).join('\n');
-                return res.send(list);
+        // 4. So sánh giá nâng cao
+        const priceNumbers = message.match(/\d{5,7}/g)?.map(n => parseInt(n));
+        if (priceNumbers?.length) {
+            let matched = [];
+
+            if (lowerMsg.includes('từ') && lowerMsg.includes('đến') && priceNumbers.length === 2) {
+                matched = products.filter(p => p.price >= priceNumbers[0] && p.price <= priceNumbers[1]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} có giá ${p.price}đ`).join('\n');
+                    return res.send(`📚 Sách giá từ ${priceNumbers[0]}đ đến ${priceNumbers[1]}đ:\n${list}`);
+                } else {
+                    return res.send(`❌ Không tìm thấy sách trong khoảng giá ${priceNumbers[0]}đ - ${priceNumbers[1]}đ.`);
+                }
+            }
+
+            if ((lowerMsg.includes('dưới') || lowerMsg.includes('trở xuống')) && priceNumbers.length >= 1) {
+                matched = products.filter(p => p.price <= priceNumbers[0]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} có giá ${p.price}đ`).join('\n');
+                    return res.send(`📚 Các sách có giá ${priceNumbers[0]}đ trở xuống:\n${list}`);
+                } else {
+                    return res.send(`❌ Không có sách nào có giá ${priceNumbers[0]}đ trở xuống.`);
+                }
+            }
+
+            if ((lowerMsg.includes('trên') || lowerMsg.includes('trở lên')) && priceNumbers.length >= 1) {
+                matched = products.filter(p => p.price >= priceNumbers[0]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} có giá ${p.price}đ`).join('\n');
+                    return res.send(`📚 Các sách có giá ${priceNumbers[0]}đ trở lên:\n${list}`);
+                } else {
+                    return res.send(`❌ Không có sách nào có giá ${priceNumbers[0]}đ trở lên.`);
+                }
+            }
+        }
+
+        // 5. So sánh năm xuất bản nâng cao
+        const yearMatch = message.match(/(19|20)\d{2}/g);
+        const yearNumbers = yearMatch?.map(y => parseInt(y));
+        if (yearNumbers?.length) {
+            let matched = [];
+
+            if (lowerMsg.includes('từ') && lowerMsg.includes('đến') && yearNumbers.length === 2) {
+                matched = products.filter(p => p.publisher_year >= yearNumbers[0] && p.publisher_year <= yearNumbers[1]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} (${p.publisher_year})`).join('\n');
+                    return res.send(`📚 Sách xuất bản từ năm ${yearNumbers[0]} đến ${yearNumbers[1]}:\n${list}`);
+                } else {
+                    return res.send(`❌ Không có sách nào xuất bản từ ${yearNumbers[0]} đến ${yearNumbers[1]}.`);
+                }
+            }
+
+            if (lowerMsg.includes('sau') && yearNumbers.length >= 1) {
+                matched = products.filter(p => p.publisher_year > yearNumbers[0]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} (${p.publisher_year})`).join('\n');
+                    return res.send(`📚 Các sách xuất bản sau năm ${yearNumbers[0]}:\n${list}`);
+                } else {
+                    return res.send(`❌ Không có sách nào xuất bản sau năm ${yearNumbers[0]}.`);
+                }
+            }
+
+            if (lowerMsg.includes('trước') && yearNumbers.length >= 1) {
+                matched = products.filter(p => p.publisher_year < yearNumbers[0]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} (${p.publisher_year})`).join('\n');
+                    return res.send(`📚 Các sách xuất bản trước năm ${yearNumbers[0]}:\n${list}`);
+                } else {
+                    return res.send(`❌ Không có sách nào xuất bản trước năm ${yearNumbers[0]}.`);
+                }
+            }
+
+            if (yearNumbers.length === 1) {
+                matched = products.filter(p => p.publisher_year === yearNumbers[0]);
+                if (matched.length > 0) {
+                    const list = matched.map(p => `📘 ${p.name_product} (${p.publisher_year})`).join('\n');
+                    return res.send(`📚 Các sách xuất bản năm ${yearNumbers[0]}:\n${list}`);
+                } else {
+                    return res.send(`❌ Không tìm thấy sách xuất bản năm ${yearNumbers[0]}.`);
+                }
             }
         }
 
