@@ -263,16 +263,14 @@ const orderController = {
                 // Redirect đến trang kết quả với các tham số
                 return res.redirect(`/order/vnpay/result?${querystring.stringify(vnp_Params)}`);
             } else {
-                // Thanh toán thất bại
-                await Order.update(
-                    { payment_status: 'failed' },
-                    { where: { id_order: orderId } }
-                );
+                // Thanh toán thất bại - Xóa đơn hàng và chi tiết đơn hàng
+                await OrderDetail.destroy({ where: { id_order: orderId } });
+                await Order.destroy({ where: { id_order: orderId } });
 
                 if (wantsJSON(req)) {
                     return res.json({
                         success: false,
-                        message: 'Thanh toán thất bại',
+                        message: 'Thanh toán thất bại - Đơn hàng đã bị hủy',
                         orderId: orderId
                     });
                 }
@@ -325,19 +323,29 @@ const orderController = {
                 });
             }
             
-            const paymentStatus = status === 'success' ? 'paid' : 'failed';
-            
-            // Cập nhật trạng thái đơn hàng
-            await Order.update(
-                { payment_status: paymentStatus },
-                { where: { id_order: orderId } }
-            );
-            
-            return res.json({
-                success: true,
-                message: `Payment ${status} (fake)`,
-                orderId: orderId
-            });
+            if (status === 'success') {
+                // Cập nhật trạng thái đơn hàng thành công
+                await Order.update(
+                    { payment_status: 'paid' },
+                    { where: { id_order: orderId } }
+                );
+                
+                return res.json({
+                    success: true,
+                    message: `Payment success (fake)`,
+                    orderId: orderId
+                });
+            } else {
+                // Thanh toán thất bại - Xóa đơn hàng và chi tiết đơn hàng
+                await OrderDetail.destroy({ where: { id_order: orderId } });
+                await Order.destroy({ where: { id_order: orderId } });
+                
+                return res.json({
+                    success: true,
+                    message: `Payment failed - Order deleted (fake)`,
+                    orderId: orderId
+                });
+            }
         } catch (error) {
             console.error('Fake payment error:', error);
             return res.status(500).json({
