@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VNPay Mock Payment</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .payment-container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .logo { width: 100px; height: 50px; background: #1976d2; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border-radius: 5px; }
+        .amount { font-size: 24px; font-weight: bold; color: #e91e63; text-align: center; margin: 20px 0; }
+        .qr-code { width: 200px; height: 200px; background: #fff; border: 1px solid #ddd; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; position: relative; }
+        .qr-code::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid #333; }
+        .qr-code::after { content: ''; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; background: #333; transform: translate(-50%, -50%); }
+        .order-info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .info-row { display: flex; justify-content: space-between; margin: 10px 0; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="header">
+            <div class="logo">VNPAY</div>
+            <h3>Thanh toán VNPay</h3>
+        </div>
+        
+        <div class="amount">
+            <span id="amount">120,000</span> VNĐ
+        </div>
+        
+        <div class="qr-code">
+            <div style="text-align: center; z-index: 1; background: white; padding: 5px; border-radius: 3px;">
+                <div style="font-size: 16px; margin-bottom: 5px;">📱</div>
+                <div style="font-size: 10px;">Quét mã QR<br>để thanh toán</div>
+            </div>
+        </div>
+        
+        <div class="order-info">
+            <div class="info-row">
+                <span>Mã đơn hàng:</span>
+                <span id="orderId">20</span>
+            </div>
+            <div class="info-row">
+                <span>Nội dung:</span>
+                <span id="orderInfo">Thanh toan don hang</span>
+            </div>
+            <div class="info-row">
+                <span>Merchant:</span>
+                <span>Bookstore App</span>
+            </div>
+            <div class="info-row">
+                <span>Thời gian:</span>
+                <span id="datetime"></span>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="simulatePayment('success')">
+                ✅ Thanh toán thành công
+            </button>
+            <button class="btn btn-danger" onclick="simulatePayment('failed')">
+                ❌ Thanh toán thất bại
+            </button>
+        </div>
+        
+        <div class="btn-group" style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="window.close()">
+                🔙 Quay lại
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Lấy thông tin từ URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Ưu tiên lấy từ VNPay parameters, nếu không có thì lấy từ simple parameters
+        const orderId = urlParams.get('vnp_TxnRef') || urlParams.get('orderId') || '20';
+        const vnpAmount = urlParams.get('vnp_Amount'); // VNPay amount is * 100
+        const amount = vnpAmount ? (vnpAmount / 100).toString() : (urlParams.get('amount') || '120000');
+        const orderInfo = urlParams.get('vnp_OrderInfo') || urlParams.get('orderInfo') || 'Thanh toan don hang';
+        
+        // Cập nhật thông tin hiển thị
+        document.getElementById('orderId').textContent = orderId;
+        document.getElementById('amount').textContent = new Intl.NumberFormat('vi-VN').format(amount);
+        document.getElementById('orderInfo').textContent = decodeURIComponent(orderInfo);
+        document.getElementById('datetime').textContent = new Date().toLocaleString('vi-VN');
+        
+        console.log('Mock Payment Debug:', {
+            orderId: orderId,
+            amount: amount,
+            orderInfo: orderInfo,
+            vnpAmount: vnpAmount,
+            allParams: Object.fromEntries(urlParams)
+        });
+        
+        async function simulatePayment(status) {
+            try {
+                const response = await fetch('/order/fake-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        status: status
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`${status === 'success' ? 'Thanh toán thành công!' : 'Thanh toán thất bại!'}\nMã đơn hàng: ${orderId}\nSố tiền: ${new Intl.NumberFormat('vi-VN').format(amount)} VNĐ`);
+                    
+                    // Redirect về trang kết quả với mock parameters
+                    const mockParams = {
+                        orderId: orderId,
+                        amount: amount,
+                        orderInfo: orderInfo,
+                        paymentStatus: status === 'success' ? 'paid' : 'failed',
+                        isMockPayment: 'true',
+                        responseCode: status === 'success' ? '00' : '01',
+                        message: status === 'success' ? 'Thanh toán thành công' : 'Thanh toán thất bại'
+                    };
+                    
+                    const returnUrl = `/order/vnpay/result?${new URLSearchParams(mockParams).toString()}`;
+                    window.location.href = returnUrl;
+                } else {
+                    alert('Có lỗi xảy ra: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Lỗi kết nối: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

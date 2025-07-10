@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VNPay Test Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VNPay Integration Test Interface</h1>
+        
+        <div class="test-section">
+            <h2>1. Test VNPay URL Generation</h2>
+            <button onclick="testVNPayURL()">Generate VNPay URL</button>
+            <div id="vnpay-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Test Fake Payment</h2>
+            <input type="number" id="orderIdSuccess" placeholder="Order ID" value="17">
+            <button onclick="testFakePayment('success')">Test Success</button>
+            <button onclick="testFakePayment('failed')">Test Failed</button>
+            <div id="fake-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Check Order Status</h2>
+            <input type="number" id="orderIdStatus" placeholder="Order ID" value="17">
+            <button onclick="checkOrderStatus()">Check Status</button>
+            <div id="status-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. VNPay Sandbox Test Info</h2>
+            <div class="info">
+                <p><strong>Test Card:</strong> 9704198526191432198</p>
+                <p><strong>Cardholder:</strong> NGUYEN VAN A</p>
+                <p><strong>Issue Date:</strong> 07/15</p>
+                <p><strong>Password:</strong> 123456</p>
+                <p><strong>OTP:</strong> 123456</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testVNPayURL() {
+            try {
+                const response = await fetch('/test/vnpay-url');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('vnpay-result').innerHTML = `
+                        <div class="success">
+                            <p>URL Generated Successfully!</p>
+                            <p><strong>URL:</strong> <a href="${data.vnpayUrl}" target="_blank">${data.vnpayUrl}</a></p>
+                            <p><strong>Order ID:</strong> ${data.orderId}</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('vnpay-result').innerHTML = `
+                        <div class="error">Error: ${data.message}</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('vnpay-result').innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        }
+        
+        async function testFakePayment(status) {
+            const orderId = document.getElementById('orderIdSuccess').value;
+            
+            try {
+                const response = await fetch('/order/fake-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        status: status
+                    })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('fake-result').innerHTML = `
+                    <div class="${data.success ? 'success' : 'error'}">
+                        <p>Result: ${data.message}</p>
+                        <p>Order ID: ${data.orderId}</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('fake-result').innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        }
+        
+        async function checkOrderStatus() {
+            const orderId = document.getElementById('orderIdStatus').value;
+            
+            try {
+                const response = await fetch(`/order/payment-status/${orderId}`);
+                const data = await response.json();
+                
+                document.getElementById('status-result').innerHTML = `
+                    <div class="${data.success ? 'success' : 'error'}">
+                        <p>Order ID: ${data.orderId}</p>
+                        <p>Payment Status: ${data.paymentStatus}</p>
+                        <p>Is Paid: ${data.isPaid}</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('status-result').innerHTML = `
+                    <div class="error">Error: ${error.message}</div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
