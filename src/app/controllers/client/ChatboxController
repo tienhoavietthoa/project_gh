@@ -1,0 +1,55 @@
+const Product = require('../../../models/product');
+const Category = require('../../../models/category');
+
+const ChatboxController = {
+    async chat(req, res) {
+        try {
+            const msg = req.body.message.toLowerCase();
+
+            if (msg.includes("của") && msg.includes("sách")) {
+                const keyword = msg.split("của")[1].trim();
+                const books = await Product.findAll({
+                    where: { author: { [Op.like]: `%${keyword}%` } },
+                    attributes: ['name_product']
+                });
+                if (!books.length) return res.json({ response: `Không tìm thấy sách của ${keyword}` });
+                const result = books.map(b => b.name_product).join(", ");
+                return res.json({ response: `Sách của ${keyword} gồm: ${result}` });
+
+            } else if (msg.includes("thể loại") || msg.includes("loại sách")) {
+                const keyword = msg.split("thể loại")[1]?.trim() || msg.split("loại sách")[1]?.trim();
+                const books = await Product.findAll({
+                    include: {
+                        model: Category,
+                        where: { name_category: { [Op.like]: `%${keyword}%` } }
+                    },
+                    attributes: ['name_product']
+                });
+                if (!books.length) return res.json({ response: `Không có sách thể loại ${keyword}` });
+                const result = books.map(b => b.name_product).join(", ");
+                return res.json({ response: `Sách thể loại ${keyword} gồm: ${result}` });
+
+            } else if (msg.includes("rẻ") || msg.includes("dưới")) {
+                const price = msg.match(/\d+/g);
+                const maxPrice = price ? parseInt(price[0]) : 100000;
+                const books = await Product.findAll({
+                    where: { price: { [Op.lte]: maxPrice } },
+                    attributes: ['name_product', 'price'],
+                    order: [['price', 'ASC']]
+                });
+                if (!books.length) return res.json({ response: "Không tìm thấy sách giá rẻ." });
+                const result = books.map(b => `${b.name_product} (${b.price}đ)`).join(", ");
+                return res.json({ response: `Sách giá dưới ${maxPrice}đ: ${result}` });
+
+            } else {
+                return res.json({ response: "Bạn có thể hỏi tôi về sách theo tên, thể loại, tác giả hoặc giá tiền." });
+            }
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ response: "Đã xảy ra lỗi." });
+        }
+    }
+};
+
+module.exports = ChatboxController;
